@@ -1,0 +1,139 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             x:Class="CajaApp.Views.AperturaView"
+             x:DataType="vm:AperturaViewModel">
+
+    <StackPanel>
+
+        <StackPanel Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="h1" Text="Apertura de caja" />
+            <TextBlock Classes="sub" Text="Registra el inicio de tu turno antes de procesar cualquier operación." />
+        </StackPanel>
+
+        <Grid MaxWidth="760" HorizontalAlignment="Left">
+
+            <!-- ==========================================
+                 DATOS DEL TURNO
+                 ========================================== -->
+            <Border Classes="card" VerticalAlignment="Top">
+                <Panel>
+
+                    <!-- FORMULARIO -->
+                    <StackPanel IsVisible="{Binding MostrarFormulario}">
+                        <TextBlock Classes="h3" Text="Datos del turno" Margin="0,0,0,16" />
+
+                        <Grid ColumnDefinitions="1.45*,*" ColumnSpacing="14" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Classes="label" Text="Caja / ventanilla" />
+                                <ComboBox ItemsSource="{Binding CajasDisponibles}"
+                                          SelectedItem="{Binding Caja}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Classes="label" Text="Fecha del turno" />
+                                <TextBox Text="{Binding FechaTurno, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="1.45*,*" ColumnSpacing="14" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Classes="label" Text="Balance inicial (efectivo asignado)" />
+                                <TextBox Classes="grande"
+                                         Text="{Binding BalanceInicialTexto}"
+                                         PlaceholderText="0.00">
+                                <TextBox.InnerLeftContent>
+                                    <TextBlock Classes="prefijo" Text="RD$" />
+                                </TextBox.InnerLeftContent>
+                            </TextBox>
+                                <TextBlock Classes="hint" Text="{Binding BalanceVistaPrevia}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Classes="label" Text="Cajero responsable" />
+                                <TextBox Text="{Binding Cajero, Mode=OneWay}" IsReadOnly="True" IsEnabled="False" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Classes="label" Text="Observación (opcional)" />
+                        <TextBox Text="{Binding Observacion}"
+                                 PlaceholderText="Ej.: fondo entregado por supervisión"
+                                 MaxLength="250"
+                                 Margin="0,0,0,18" />
+
+                        <Border Classes="notice rojo" Margin="0,0,0,14" IsVisible="{Binding HayMensaje}">
+                            <DockPanel>
+                                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                                <TextBlock Text="{Binding Mensaje}" />
+                            </DockPanel>
+                        </Border>
+
+                        <Button Classes="primary"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding AbrirCajaCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconoAbrir}" />
+                                <TextBlock Text="Abrir caja y comenzar turno" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- CONFIRMACIÓN / TURNO YA ABIERTO -->
+                    <StackPanel IsVisible="{Binding !MostrarFormulario}">
+                        <Border Classes="notice verde" Margin="0,0,0,16" IsVisible="{Binding AperturaExitosa}">
+                            <DockPanel>
+                                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoCheck}" />
+                                <TextBlock Text="Caja abierta correctamente. Ya puedes registrar transacciones." />
+                            </DockPanel>
+                        </Border>
+                        <Border Classes="notice" Margin="0,0,0,16" IsVisible="{Binding YaHayTurnoAbierto}">
+                            <DockPanel>
+                                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoInfo}" />
+                                <TextBlock Text="Ya tienes un turno abierto. Para abrir otro, primero realiza el cuadre y cierre del actual." />
+                            </DockPanel>
+                        </Border>
+
+                        <TextBlock Classes="h3" Text="Turno en curso" Margin="0,0,0,8" />
+
+                        <Border Classes="row">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Ventanilla" />
+                                <TextBlock Grid.Column="1" Classes="td" Text="{Binding CajaConfirmada}" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="row">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Turno" />
+                                <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding TurnoConfirmado}" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="row">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Balance inicial" />
+                                <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding BalanceConfirmado}" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="row" BorderThickness="0">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Abierta a las" />
+                                <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding HoraConfirmada}" />
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,18,0,0">
+                            <Button Classes="secondary" Content="Ir a inicio" Command="{Binding IrInicioCommand}" />
+                            <Button Classes="primary" Command="{Binding IrTransaccionCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Registrar transacción" />
+                                    <PathIcon Data="{StaticResource IconoFlecha}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+
+                </Panel>
+            </Border>
+
+        </Grid>
+
+    </StackPanel>
+
+</UserControl>

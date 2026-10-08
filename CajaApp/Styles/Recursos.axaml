@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- =====================================================
+         PALETA INSTITUCIONAL (tomada del prototipo HTML)
+         ===================================================== -->
+
+    <Color x:Key="ColorAzulPrimario">#1F5E95</Color>
+    <Color x:Key="ColorAzulPrimarioOscuro">#184A78</Color>
+    <Color x:Key="ColorAzulClaro">#5FA8D3</Color>
+    <Color x:Key="ColorAzulSuave">#EAF5FC</Color>
+    <Color x:Key="ColorAzulOscuro">#163D63</Color>
+    <Color x:Key="ColorFondo">#F8FCFF</Color>
+    <Color x:Key="ColorTexto">#3E5266</Color>
+    <Color x:Key="ColorTextoSuave">#7C93A8</Color>
+    <Color x:Key="ColorBorde">#1F163D63</Color>
+    <Color x:Key="ColorBordeFuerte">#AFC9DB</Color>
+
+    <Color x:Key="ColorRojo">#C96A6A</Color>
+    <Color x:Key="ColorRojoFondo">#FBEDED</Color>
+    <Color x:Key="ColorRojoTexto">#A34848</Color>
+    <Color x:Key="ColorVerde">#6BB58A</Color>
+    <Color x:Key="ColorVerdeFondo">#EBF6EF</Color>
+    <Color x:Key="ColorVerdeTexto">#2F7A52</Color>
+    <Color x:Key="ColorAmarillo">#E7C76A</Color>
+    <Color x:Key="ColorAmarilloFondo">#FCF6E7</Color>
+    <Color x:Key="ColorAmarilloTexto">#8C6D14</Color>
+
+    <SolidColorBrush x:Key="AzulPrimario" Color="{StaticResource ColorAzulPrimario}" />
+    <SolidColorBrush x:Key="AzulPrimarioOscuro" Color="{StaticResource ColorAzulPrimarioOscuro}" />
+    <SolidColorBrush x:Key="AzulClaro" Color="{StaticResource ColorAzulClaro}" />
+    <SolidColorBrush x:Key="AzulSuave" Color="{StaticResource ColorAzulSuave}" />
+    <SolidColorBrush x:Key="AzulOscuro" Color="{StaticResource ColorAzulOscuro}" />
+    <SolidColorBrush x:Key="Fondo" Color="{StaticResource ColorFondo}" />
+    <SolidColorBrush x:Key="Texto" Color="{StaticResource ColorTexto}" />
+    <SolidColorBrush x:Key="TextoSuave" Color="{StaticResource ColorTextoSuave}" />
+    <SolidColorBrush x:Key="Borde" Color="{StaticResource ColorBorde}" />
+    <SolidColorBrush x:Key="BordeFuerte" Color="{StaticResource ColorBordeFuerte}" />
+
+    <SolidColorBrush x:Key="Rojo" Color="{StaticResource ColorRojo}" />
+    <SolidColorBrush x:Key="RojoFondo" Color="{StaticResource ColorRojoFondo}" />
+    <SolidColorBrush x:Key="RojoTexto" Color="{StaticResource ColorRojoTexto}" />
+    <SolidColorBrush x:Key="Verde" Color="{StaticResource ColorVerde}" />
+    <SolidColorBrush x:Key="VerdeFondo" Color="{StaticResource ColorVerdeFondo}" />
+    <SolidColorBrush x:Key="VerdeTexto" Color="{StaticResource ColorVerdeTexto}" />
+    <SolidColorBrush x:Key="Amarillo" Color="{StaticResource ColorAmarillo}" />
+    <SolidColorBrush x:Key="AmarilloFondo" Color="{StaticResource ColorAmarilloFondo}" />
+    <SolidColorBrush x:Key="AmarilloTexto" Color="{StaticResource ColorAmarilloTexto}" />
+
+    <!-- Barra lateral -->
+    <SolidColorBrush x:Key="SidebarTexto" Color="#C9DCEB" />
+    <SolidColorBrush x:Key="SidebarEtiqueta" Color="#7794AC" />
+    <SolidColorBrush x:Key="SidebarSuave" Color="#9FC0DA" />
+    <SolidColorBrush x:Key="SidebarHover" Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="SidebarActivo" Color="#2E5FA8D3" />
+    <SolidColorBrush x:Key="SidebarCaja" Color="#10FFFFFF" />
+    <SolidColorBrush x:Key="SidebarLinea" Color="#14FFFFFF" />
+
+    <!-- =====================================================
+         TIPOGRAFÍA (archivos en Assets/Fonts)
+         ===================================================== -->
+
+    <FontFamily x:Key="FuenteUI">avares://CajaApp/Assets/Fonts#Public Sans</FontFamily>
+    <FontFamily x:Key="FuenteMono">avares://CajaApp/Assets/Fonts#IBM Plex Mono</FontFamily>
+    <!-- Variante seminegrita para cifras destacadas (montos, indicadores) -->
+    <FontFamily x:Key="FuenteMonoFuerte">avares://CajaApp/Assets/Fonts#IBM Plex Mono SemiBold</FontFamily>
+
+    <!-- =====================================================
+         SOMBRAS
+         ===================================================== -->
+
+    <BoxShadows x:Key="SombraTarjeta">0 1 2 0 #0D163D63, 0 4 14 0 #10163D63</BoxShadows>
+    <BoxShadows x:Key="SombraElevada">0 8 24 0 #26163D63</BoxShadows>
+
+    <!-- =====================================================
+         ÍCONOS (geometrías vectoriales, estilo Material)
+         ===================================================== -->
+
+    <StreamGeometry x:Key="IconoInicio">M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoAbrir">M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoCerrar">M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoRecibo">M3,22L4.5,20.5L6,22L7.5,20.5L9,22L10.5,20.5L12,22L13.5,20.5L15,22L16.5,20.5L18,22L19.5,20.5L21,22V2L19.5,3.5L18,2L16.5,3.5L15,2L13.5,3.5L12,2L10.5,3.5L9,2L7.5,3.5L6,2L4.5,3.5L3,2M18,9H6V7H18M18,13H6V11H18M18,17H6V15H18V17Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoEscudo">M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoLista">M7,5H21V7H7V5M7,13V11H21V13H7M4,4.5A1.5,1.5 0 0,1 5.5,6A1.5,1.5 0 0,1 4,7.5A1.5,1.5 0 0,1 2.5,6A1.5,1.5 0 0,1 4,4.5M4,10.5A1.5,1.5 0 0,1 5.5,12A1.5,1.5 0 0,1 4,13.5A1.5,1.5 0 0,1 2.5,12A1.5,1.5 0 0,1 4,10.5M7,19V17H21V19H7M4,16.5A1.5,1.5 0 0,1 5.5,18A1.5,1.5 0 0,1 4,19.5A1.5,1.5 0 0,1 2.5,18A1.5,1.5 0 0,1 4,16.5Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoBanco">M11.5,1L2,6V8H21V6M16,10V17H19V10M2,22H21V19H2M10,10V17H13V10M4,10V17H7V10H4Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoBalanza">M12,3C10.73,3 9.6,3.8 9.18,5H3V7H4.95L2,14C1.53,16 3,17 5.5,17C8,17 9.56,16 9,14L6.05,7H9.17C9.5,7.85 10.15,8.5 11,8.83V20H2V22H22V20H13V8.82C13.85,8.5 14.5,7.85 14.82,7H17.95L15,14C14.53,16 16,17 18.5,17C21,17 22.56,16 22,14L19.05,7H21V5H14.83C14.4,3.8 13.27,3 12,3M12,5A1,1 0 0,1 13,6A1,1 0 0,1 12,7A1,1 0 0,1 11,6A1,1 0 0,1 12,5M5.5,10.25L7,14H4L5.5,10.25M18.5,10.25L20,14H17L18.5,10.25Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoSync">M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoSalir">M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoCheck">M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoAlerta">M13,14H11V9H13M13,18H11V16H13M1,21H23L12,2L1,21Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoInfo">M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoImpresora">M18,3H6V7H18M19,12A1,1 0 0,1 18,11A1,1 0 0,1 19,10A1,1 0 0,1 20,11A1,1 0 0,1 19,12M16,19H8V14H16M19,8H5A3,3 0 0,0 2,11V17H6V21H18V17H22V11A3,3 0 0,0 19,8Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoRefrescar">M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoUsuario">M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoBuscar">M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoMas">M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoEfectivo">M3,6H21V18H3V6M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M7,8A2,2 0 0,1 5,10V14A2,2 0 0,1 7,16H17A2,2 0 0,1 19,14V10A2,2 0 0,1 17,8H7Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoAyuda">M15.07,11.25L14.17,12.17C13.45,12.89 13,13.5 13,15H11V14.5C11,13.39 11.45,12.39 12.17,11.67L13.41,10.41C13.78,10.05 14,9.55 14,9C14,7.89 13.1,7 12,7A2,2 0 0,0 10,9H8A4,4 0 0,1 12,5A4,4 0 0,1 16,9C16,9.88 15.64,10.67 15.07,11.25M13,19H11V17H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoChevron">M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z</StreamGeometry>
+    <StreamGeometry x:Key="IconoFlecha">M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z</StreamGeometry>
+
+</ResourceDictionary>

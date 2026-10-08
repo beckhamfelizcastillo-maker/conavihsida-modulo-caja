@@ -1,0 +1,227 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             x:Class="CajaApp.Views.CierreView"
+             x:DataType="vm:CierreViewModel">
+
+    <Panel>
+
+        <!-- ==================================================
+             CUADRE Y CIERRE (turno abierto)
+             ================================================== -->
+        <StackPanel IsVisible="{Binding MostrarCuadre}">
+
+            <StackPanel Spacing="4" Margin="0,0,0,20">
+                <TextBlock Classes="h1" Text="Cuadre y cierre de caja" />
+                <TextBlock Classes="sub" Text="Resumen de cobros, subsidios y formas de pago del turno. Cuenta el efectivo y cierra la jornada." />
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="16" Margin="0,0,0,20">
+                <Border Classes="stat">
+                    <StackPanel>
+                        <TextBlock Classes="statLabel" Text="Total cobrado" />
+                        <TextBlock Classes="statValue" Text="{Binding TotalCobrosTexto}" />
+                        <TextBlock Classes="statSub"><Run Text="{Binding CantidadOperaciones}" /><Run Text=" operaciones en el turno" /></TextBlock>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="stat verde">
+                    <StackPanel>
+                        <TextBlock Classes="statLabel" Text="Entregas subsidiadas" />
+                        <TextBlock Classes="statValue" Text="{Binding CantidadSubsidiadas}" />
+                        <TextBlock Classes="statSub" Text="RD$ 0.00 cobrado al beneficiario" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="stat amarillo">
+                    <StackPanel>
+                        <TextBlock Classes="statLabel" Text="Efectivo esperado en caja" />
+                        <TextBlock Classes="statValue" Text="{Binding EfectivoEsperadoTexto}" />
+                        <TextBlock Classes="statSub" Text="Inicial + cobros en efectivo" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Classes="stat azul">
+                    <StackPanel>
+                        <TextBlock Classes="statLabel" Text="Cobros con tarjeta" />
+                        <TextBlock Classes="statValue" Text="{Binding TotalTarjetaTexto}" />
+                        <TextBlock Classes="statSub" Text="No forman parte del efectivo" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,1.15*" ColumnSpacing="16">
+
+                <!-- DETALLE DEL TURNO -->
+                <Border Classes="card" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Classes="h3" Text="Detalle del turno" Margin="0,0,0,8" />
+
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Caja" />
+                            <TextBlock Grid.Column="1" Classes="td" Text="{Binding Caja}" />
+                        </Grid></Border>
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Turno" />
+                            <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding NumeroTurno}" />
+                        </Grid></Border>
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Cajero" />
+                            <TextBlock Grid.Column="1" Classes="td" Text="{Binding Cajero}" />
+                        </Grid></Border>
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Apertura" />
+                            <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding HoraApertura}" />
+                        </Grid></Border>
+
+                        <TextBlock Classes="th" Text="DETALLE POR FORMA DE PAGO" Margin="12,18,0,4" />
+
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Balance inicial" />
+                            <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding BalanceInicialTexto}" />
+                        </Grid></Border>
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Efectivo" />
+                            <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding TotalEfectivoTexto}" />
+                        </Grid></Border>
+                        <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Tarjeta" />
+                            <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding TotalTarjetaTexto}" />
+                        </Grid></Border>
+                        <Border Classes="row" BorderThickness="0"><Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Classes="td" Text="Subsidiado (sin cobro)" />
+                            <TextBlock Grid.Column="1" Classes="td amount" Text="RD$ 0.00" />
+                        </Grid></Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- VERIFICACIÓN DE EFECTIVO -->
+                <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Classes="h3" Text="Verificación de efectivo" Margin="0,0,0,16" />
+
+                        <TextBlock Classes="label" Text="Efectivo contado físicamente" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <TextBox Classes="grande"
+                                     Text="{Binding EfectivoDeclaradoTexto}"
+                                     PlaceholderText="0.00">
+                                <TextBox.InnerLeftContent>
+                                    <TextBlock Classes="prefijo" Text="RD$" />
+                                </TextBox.InnerLeftContent>
+                            </TextBox>
+                            <Button Grid.Column="1" Classes="ghost" Padding="12,8" FontSize="12"
+                                    ToolTip.Tip="Copiar el efectivo esperado si el conteo coincide"
+                                    Content="Usar esperado"
+                                    Command="{Binding UsarEsperadoCommand}" />
+                        </Grid>
+
+                        <!-- RESULTADO DEL CUADRE -->
+                        <Panel Margin="0,14,0,0">
+                            <TextBlock Classes="muted" FontSize="12.5" TextWrapping="Wrap"
+                                       IsVisible="{Binding SinDeclarar}"
+                                       Text="{Binding MensajeCuadre}" />
+                            <Border Classes="notice verde" IsVisible="{Binding EsCuadreExacto}">
+                                <DockPanel>
+                                    <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoCheck}" />
+                                    <TextBlock Text="{Binding MensajeCuadre}" />
+                                </DockPanel>
+                            </Border>
+                            <Border Classes="notice amarillo" IsVisible="{Binding EsSobrante}">
+                                <DockPanel>
+                                    <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                                    <TextBlock Text="{Binding MensajeCuadre}" />
+                                </DockPanel>
+                            </Border>
+                            <Border Classes="notice rojo" IsVisible="{Binding EsFaltante}">
+                                <DockPanel>
+                                    <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                                    <TextBlock Text="{Binding MensajeCuadre}" />
+                                </DockPanel>
+                            </Border>
+                        </Panel>
+
+                        <StackPanel Margin="0,10,0,0" IsVisible="{Binding HaDeclarado}">
+                            <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Esperado" />
+                                <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding EfectivoEsperadoTexto}" />
+                            </Grid></Border>
+                            <Border Classes="row"><Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" Text="Contado" />
+                                <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding ContadoTexto}" />
+                            </Grid></Border>
+                            <Border Classes="row" BorderThickness="0"><Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="td" FontWeight="Bold" Text="Diferencia" />
+                                <TextBlock Grid.Column="1" Classes="td amount" Text="{Binding DiferenciaTexto}" />
+                            </Grid></Border>
+                        </StackPanel>
+
+                        <TextBlock Classes="label" Text="Observación del cierre" Margin="0,16,0,6" />
+                        <TextBox Text="{Binding Observacion}"
+                                 PlaceholderText="Obligatoria si hay sobrante o faltante"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="70"
+                                 MaxLength="500"
+                                 VerticalContentAlignment="Top" />
+
+                        <Border Classes="notice amarillo" Margin="0,16,0,0">
+                            <DockPanel>
+                                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                                <TextBlock Text="Al cerrar el turno no podrás registrar más transacciones en esta caja. Verifica el cuadre antes de continuar." />
+                            </DockPanel>
+                        </Border>
+
+                        <Border Classes="notice rojo" Margin="0,12,0,0" IsVisible="{Binding HayMensaje}">
+                            <DockPanel>
+                                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoInfo}" />
+                                <TextBlock Text="{Binding Mensaje}" />
+                            </DockPanel>
+                        </Border>
+
+                        <Button Classes="danger" HorizontalAlignment="Stretch" Margin="0,16,0,0"
+                                Command="{Binding CerrarCajaCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconoCerrar}" />
+                                <TextBlock Text="Cerrar caja y finalizar turno" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+        </StackPanel>
+
+        <!-- ==================================================
+             TURNO CERRADO
+             ================================================== -->
+        <Border Classes="card" IsVisible="{Binding TurnoCerrado}"
+                HorizontalAlignment="Center" VerticalAlignment="Top" Width="560" Margin="0,40,0,0" Padding="40">
+            <StackPanel Spacing="10">
+                <Border Width="64" Height="64" CornerRadius="32" HorizontalAlignment="Center"
+                        Background="{StaticResource VerdeFondo}">
+                    <PathIcon Data="{StaticResource IconoCerrar}" Width="28" Height="28"
+                              Foreground="{StaticResource VerdeTexto}" />
+                </Border>
+                <TextBlock Classes="h2" FontSize="20" HorizontalAlignment="Center" Text="Turno cerrado correctamente" />
+                <TextBlock Classes="sub" TextAlignment="Center" Text="{Binding ResultadoCierre}" />
+                <TextBlock Classes="muted" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="El cierre quedó registrado en la bitácora de auditoría y se sincronizará con Integration. Puedes abrir un nuevo turno cuando lo necesites." />
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <Button Classes="secondary" Content="Ir a inicio" Command="{Binding IrInicioCommand}" />
+                    <Button Classes="primary" Content="Abrir nueva caja" Command="{Binding NuevaAperturaCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ==================================================
+             SIN TURNO
+             ================================================== -->
+        <Border Classes="card" IsVisible="{Binding SinTurno}"
+                HorizontalAlignment="Center" VerticalAlignment="Top" Width="520" Margin="0,40,0,0" Padding="36">
+            <StackPanel Spacing="10">
+                <TextBlock Classes="h2" HorizontalAlignment="Center" Text="No hay un turno abierto" />
+                <TextBlock Classes="sub" TextAlignment="Center" Text="Abre la caja para poder hacer el cuadre y el cierre." />
+                <Button Classes="primary" HorizontalAlignment="Center" Content="Ir a apertura" Command="{Binding NuevaAperturaCommand}" />
+            </StackPanel>
+        </Border>
+
+    </Panel>
+
+</UserControl>

@@ -1,0 +1,15 @@
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+TestResults/
+
+# Archivos generados por la aplicación
+*.db
+*.db-shm
+*.db-wal
+Logs/
+Comprobantes/

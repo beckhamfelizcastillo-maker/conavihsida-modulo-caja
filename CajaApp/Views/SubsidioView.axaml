@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             x:Class="CajaApp.Views.SubsidioView"
+             x:DataType="vm:SubsidioViewModel">
+
+    <StackPanel>
+
+        <StackPanel Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="h1" Text="Validar subsidio" />
+            <TextBlock Classes="sub" Text="Confirma la elegibilidad financiera antes de facturar. No se muestra información clínica." />
+        </StackPanel>
+
+        <Grid MaxWidth="760" HorizontalAlignment="Left">
+
+            <!-- ==========================================
+                 CONSULTA
+                 ========================================== -->
+            <Border Classes="card" VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock Classes="h3" Text="Consulta de elegibilidad" Margin="0,0,0,16" />
+
+                    <TextBlock Classes="label" Text="Cédula del beneficiario" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <TextBox Classes="mono"
+                                 Text="{Binding Cedula}"
+                                 PlaceholderText="000-0000000-0"
+                                 MaxLength="13" />
+                        <Button Grid.Column="1" Classes="primary"
+                                IsDefault="True"
+                                Command="{Binding ValidarCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <PathIcon Data="{StaticResource IconoBuscar}" />
+                                <TextBlock Text="Consultar cobertura" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <TextBlock Classes="hint" Text="Puedes escribirla con o sin guiones. Para la demostración: 001-1234567-8 (activo) o 001-9999999-9 (vencido)." />
+
+                    <Border Classes="notice rojo" Margin="0,14,0,0" IsVisible="{Binding HayMensaje}">
+                        <DockPanel>
+                            <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                            <TextBlock Text="{Binding Mensaje}" />
+                        </DockPanel>
+                    </Border>
+
+                    <!-- RESULTADO -->
+                    <Border Margin="0,18,0,0" Padding="18" CornerRadius="10"
+                            Background="{StaticResource Fondo}"
+                            BorderBrush="{StaticResource Borde}" BorderThickness="1"
+                            IsVisible="{Binding MostrarResultado}">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,14">
+                                <Border Width="44" Height="44" CornerRadius="22"
+                                        Background="{StaticResource AzulPrimario}">
+                                    <PathIcon Data="{StaticResource IconoUsuario}" Width="20" Height="20" Foreground="White" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Titular}" FontWeight="Bold"
+                                               Foreground="{StaticResource AzulOscuro}" FontSize="14" />
+                                    <TextBlock Classes="muted" Text="{Binding TerminacionCedula}" />
+                                </StackPanel>
+                                <Panel Grid.Column="2" VerticalAlignment="Center">
+                                    <Border Classes="badge verde" IsVisible="{Binding TieneSubsidio}">
+                                        <TextBlock Text="● Activo" />
+                                    </Border>
+                                    <Border Classes="badge amarillo" IsVisible="{Binding Vencido}">
+                                        <TextBlock Text="● Vencido" />
+                                    </Border>
+                                    <Border Classes="badge amarillo" IsVisible="{Binding SinCobertura}">
+                                        <TextBlock Text="● Sin subsidio" />
+                                    </Border>
+                                    <Border Classes="badge rojo" IsVisible="{Binding NoEncontrado}">
+                                        <TextBlock Text="● No registrado" />
+                                    </Border>
+                                </Panel>
+                            </Grid>
+
+                            <Border Classes="row">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="td" Text="Cédula" />
+                                    <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding CedulaEnmascarada}" />
+                                </Grid>
+                            </Border>
+                            <Border Classes="row">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="td" Text="Programa" />
+                                    <TextBlock Grid.Column="1" Classes="td" Text="Atención VIH — Subsidio estatal" />
+                                </Grid>
+                            </Border>
+                            <Border Classes="row">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="td" Text="Cobertura financiera" />
+                                    <TextBlock Grid.Column="1" Classes="td" Text="{Binding Cobertura}" />
+                                </Grid>
+                            </Border>
+                            <Border Classes="row">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="td" Text="Porcentaje" />
+                                    <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding Porcentaje}" />
+                                </Grid>
+                            </Border>
+                            <Border Classes="row" BorderThickness="0">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Classes="td" Text="Vigencia" />
+                                    <TextBlock Grid.Column="1" Classes="td mono" Text="{Binding Vigencia}" />
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
+                                <Button Classes="ghost" Content="Nueva consulta" Command="{Binding NuevaConsultaCommand}" />
+                                <Button Classes="primary" IsVisible="{Binding MostrarContinuar}"
+                                        Command="{Binding ContinuarCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="Continuar a transacción" />
+                                        <PathIcon Data="{StaticResource IconoFlecha}" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <TextBlock Classes="hint" Margin="0,10,0,0"
+                                       IsVisible="{Binding MostrarAvisoCajaCerrada}"
+                                       Text="Abre tu caja para registrar la entrega con este subsidio." />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+    </StackPanel>
+
+</UserControl>

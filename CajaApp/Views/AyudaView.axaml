@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             xmlns:items="using:CajaApp.ViewModels.Items"
+             x:Class="CajaApp.Views.AyudaView"
+             x:DataType="vm:AyudaViewModel">
+
+    <StackPanel>
+
+        <!-- ENCABEZADO -->
+        <StackPanel Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="h1" Text="Preguntas frecuentes" />
+            <TextBlock Classes="sub" Text="Respuestas rápidas sobre el uso del módulo Caja. Haz clic en una pregunta para ver la respuesta." />
+        </StackPanel>
+
+        <!-- BÚSQUEDA -->
+        <TextBox Text="{Binding Busqueda}"
+                 PlaceholderText="Buscar una pregunta (por ejemplo: cédula, cierre, sin conexión)"
+                 Margin="0,0,0,12">
+            <TextBox.InnerLeftContent>
+                <PathIcon Data="{StaticResource IconoBuscar}" Width="15" Height="15"
+                          Foreground="{StaticResource TextoSuave}" Margin="0,0,8,0" />
+            </TextBox.InnerLeftContent>
+        </TextBox>
+
+        <!-- TEMAS -->
+        <DockPanel Margin="0,0,0,18">
+            <Button DockPanel.Dock="Left" VerticalAlignment="Top"
+                    Classes="chip" Classes.on="{Binding TodasSeleccionadas}"
+                    Content="Todos los temas"
+                    Command="{Binding VerTodasCommand}" />
+            <ItemsControl ItemsSource="{Binding Categorias}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="items:CategoriaAyuda">
+                        <Button Classes="chip" Classes.on="{Binding Seleccionada}"
+                                Content="{Binding Titulo}"
+                                Command="{Binding $parent[UserControl].((vm:AyudaViewModel)DataContext).VerCategoriaCommand}"
+                                CommandParameter="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </DockPanel>
+
+        <!-- SIN RESULTADOS -->
+        <Border Classes="notice" Margin="0,0,0,16" IsVisible="{Binding SinResultados}">
+            <DockPanel>
+                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoInfo}" />
+                <Button DockPanel.Dock="Right" Classes="link" FontWeight="Bold"
+                        Content="Limpiar búsqueda"
+                        Command="{Binding LimpiarBusquedaCommand}" />
+                <TextBlock Text="No encontramos preguntas con esa búsqueda." />
+            </DockPanel>
+        </Border>
+
+        <!-- PREGUNTAS POR TEMA -->
+        <ItemsControl ItemsSource="{Binding CategoriasVisibles}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Spacing="16" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="items:CategoriaAyuda">
+                    <Border Classes="card" Padding="22,18,22,8">
+                        <StackPanel>
+                            <TextBlock Classes="h3" Text="{Binding Titulo}" />
+                            <TextBlock Classes="muted" FontSize="12.5" Margin="0,2,0,8"
+                                       Text="{Binding Descripcion}" />
+
+                            <ItemsControl ItemsSource="{Binding Visibles}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="items:PreguntaItem">
+                                        <Border Classes="faqRow">
+                                            <StackPanel>
+                                                <Button Classes="faq" Command="{Binding AlternarCommand}">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <PathIcon Data="{StaticResource IconoAyuda}"
+                                                                  Width="16" Height="16"
+                                                                  Foreground="{StaticResource AzulClaro}"
+                                                                  Margin="0,0,12,0" />
+                                                        <TextBlock Grid.Column="1"
+                                                                   Classes="faqPregunta"
+                                                                   Text="{Binding Pregunta}" />
+                                                        <PathIcon Grid.Column="2"
+                                                                  Classes="chevron"
+                                                                  Classes.abierto="{Binding Abierta}"
+                                                                  Data="{StaticResource IconoChevron}" />
+                                                    </Grid>
+                                                </Button>
+                                                <TextBlock Classes="faqRespuesta"
+                                                           IsVisible="{Binding Abierta}"
+                                                           Text="{Binding Respuesta}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </StackPanel>
+
+</UserControl>

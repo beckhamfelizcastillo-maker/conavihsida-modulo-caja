@@ -1,0 +1,37 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:CajaApp"
+             x:Class="CajaApp.App"
+             RequestedThemeVariant="Light">
+
+    <!--
+        RequestedThemeVariant="Light": la aplicación siempre usa el
+        tema claro, aunque Windows esté en modo oscuro. Antes estaba
+        en "Default" y por eso los campos se ponían negros al
+        seleccionarlos en equipos con modo oscuro.
+    -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://CajaApp/Styles/Recursos.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Light"
+                                       Accent="#1F5E95"
+                                       RegionColor="#FFFFFF" />
+            </FluentTheme.Palettes>
+        </FluentTheme>
+        <StyleInclude Source="avares://CajaApp/Styles/Tema.axaml" />
+    </Application.Styles>
+
+</Application>

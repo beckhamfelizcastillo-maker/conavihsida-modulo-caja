@@ -1,0 +1,311 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             x:Class="CajaApp.Views.ShellView"
+             x:DataType="vm:ShellViewModel">
+
+    <Grid ColumnDefinitions="240,*" Background="{StaticResource Fondo}">
+
+        <!-- ==================================================
+             BARRA LATERAL
+             ================================================== -->
+
+        <Border Grid.Column="0" Background="{StaticResource AzulOscuro}">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- LOGO: clic para volver al inicio -->
+                <Button Grid.Row="0"
+                        Classes="brand"
+                        Margin="10,14,10,8"
+                        Command="{Binding ReiniciarCommand}"
+                        ToolTip.Tip="Volver al inicio y actualizar">
+                    <StackPanel Orientation="Horizontal" Spacing="11">
+                        <Border Width="40" Height="40"
+                                CornerRadius="10"
+                                Background="White"
+                                Padding="4">
+                            <Image Source="avares://CajaApp/Assets/logo-icono.png"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="1">
+                            <TextBlock Text="CONAVIHSIDA"
+                                       Foreground="White"
+                                       FontWeight="Bold"
+                                       FontSize="14" />
+                            <TextBlock Text="Módulo Caja"
+                                       Foreground="{StaticResource SidebarSuave}"
+                                       FontSize="11.5" />
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+
+                <!-- ESTADO DE LA CAJA -->
+                <Border Grid.Row="1"
+                        Margin="16,4,16,8"
+                        Padding="12,10"
+                        CornerRadius="8"
+                        Background="{StaticResource SidebarCaja}">
+                    <StackPanel Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                                     Fill="{StaticResource Verde}"
+                                     IsVisible="{Binding HayTurnoAbierto}" />
+                            <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                                     Fill="{StaticResource Rojo}"
+                                     IsVisible="{Binding CajaCerrada}" />
+                            <TextBlock Text="{Binding EstadoTurno}"
+                                       Foreground="White"
+                                       FontWeight="Bold"
+                                       FontSize="12" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="Turno" Foreground="{StaticResource SidebarSuave}" FontSize="11.5" />
+                            <TextBlock Grid.Column="1" Text="{Binding TurnoNumero}"
+                                       Classes="mono" FontSize="11"
+                                       Foreground="{StaticResource SidebarTexto}"
+                                       HorizontalAlignment="Right"
+                                       TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding HayTurnoAbierto}">
+                            <TextBlock Text="Inicial" Foreground="{StaticResource SidebarSuave}" FontSize="11.5" />
+                            <TextBlock Grid.Column="1" Text="{Binding TurnoInicial}"
+                                       Classes="mono" FontSize="11"
+                                       Foreground="{StaticResource SidebarTexto}"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- MENÚ -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="12,2,12,8">
+
+                        <TextBlock Text="GENERAL" Foreground="{StaticResource SidebarEtiqueta}"
+                                   FontSize="10.5" FontWeight="SemiBold" LetterSpacing="1"
+                                   Margin="10,6,0,5" />
+
+                        <Button Classes="nav" Classes.activo="{Binding EsInicio}"
+                                Command="{Binding IrInicioCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoInicio}" />
+                                <TextBlock Text="Inicio" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Classes="nav" Classes.activo="{Binding EsApertura}"
+                                Command="{Binding IrAperturaCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoAbrir}" />
+                                <TextBlock Text="Apertura de caja" />
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="OPERACIÓN" Foreground="{StaticResource SidebarEtiqueta}"
+                                   FontSize="10.5" FontWeight="SemiBold" LetterSpacing="1"
+                                   Margin="10,10,0,5" />
+
+                        <Button Classes="nav" Classes.activo="{Binding EsTransaccion}"
+                                Command="{Binding IrTransaccionCommand}"
+                                IsEnabled="{Binding PuedeOperarCaja}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoRecibo}" />
+                                <TextBlock Text="Nueva transacción" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Classes="nav" Classes.activo="{Binding EsSubsidio}"
+                                Command="{Binding IrSubsidioCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoEscudo}" />
+                                <TextBlock Text="Validar subsidio" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Classes="nav" Classes.activo="{Binding EsHistorial}"
+                                Command="{Binding IrHistorialCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoLista}" />
+                                <TextBlock Text="Historial" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Classes="nav" Classes.activo="{Binding EsFondos}"
+                                Command="{Binding IrFondosCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoBanco}" />
+                                <TextBlock Text="Fondos y convenios" />
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="CIERRE" Foreground="{StaticResource SidebarEtiqueta}"
+                                   FontSize="10.5" FontWeight="SemiBold" LetterSpacing="1"
+                                   Margin="10,10,0,5" />
+
+                        <Button Classes="nav" Classes.activo="{Binding EsCierre}"
+                                Command="{Binding IrCierreCommand}"
+                                IsEnabled="{Binding PuedeOperarCaja}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoBalanza}" />
+                                <TextBlock Text="Cuadre y cierre" />
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="AYUDA" Foreground="{StaticResource SidebarEtiqueta}"
+                                   FontSize="10.5" FontWeight="SemiBold" LetterSpacing="1"
+                                   Margin="10,10,0,5" />
+
+                        <Button Classes="nav" Classes.activo="{Binding EsAyuda}"
+                                Command="{Binding IrAyudaCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource IconoAyuda}" />
+                                <TextBlock Text="Preguntas frecuentes" />
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- SINCRONIZACIÓN Y SESIÓN -->
+                <StackPanel Grid.Row="3" Margin="16,8,16,16" Spacing="10">
+
+                    <Border Padding="12,10" CornerRadius="8" Background="{StaticResource SidebarCaja}">
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                                         Fill="{StaticResource Verde}" IsVisible="{Binding EnLinea}" />
+                                <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                                         Fill="{StaticResource Amarillo}" IsVisible="{Binding SinConexion}" />
+                                <TextBlock Grid.Column="1" Text="{Binding EstadoConexion}"
+                                           Margin="7,0,0,0"
+                                           Foreground="White" FontSize="12" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="2" Text="{Binding TextoPendientes}"
+                                           Foreground="{StaticResource SidebarSuave}" FontSize="11" />
+                            </Grid>
+                            <Button Classes="oscuro"
+                                    Command="{Binding SincronizarAhoraCommand}"
+                                    ToolTip.Tip="Enviar ahora los registros pendientes a Integration">
+                                <StackPanel Orientation="Horizontal" Spacing="7">
+                                    <PathIcon Data="{StaticResource IconoSync}" Width="13" Height="13" />
+                                    <TextBlock Text="Sincronizar ahora" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Height="1" Background="{StaticResource SidebarLinea}" />
+
+                    <StackPanel Spacing="2" Margin="4,0">
+                        <TextBlock Foreground="{StaticResource SidebarEtiqueta}" FontSize="11"><Run Text="Sesión: " /><Run Text="{Binding Usuario}" FontFamily="{StaticResource FuenteMono}" /></TextBlock>
+                        <TextBlock Foreground="{StaticResource SidebarEtiqueta}" FontSize="11"><Run Text="Rol: " /><Run Text="{Binding Rol}" /></TextBlock>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- ==================================================
+             CONTENIDO PRINCIPAL
+             ================================================== -->
+
+        <Grid Grid.Column="1" RowDefinitions="64,*,Auto">
+
+            <!-- BARRA SUPERIOR -->
+            <Border Grid.Row="0"
+                    Background="White"
+                    BorderBrush="{StaticResource Borde}"
+                    BorderThickness="0,0,0,1"
+                    Padding="28,0">
+                <Grid ColumnDefinitions="*,Auto">
+
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{Binding TituloPagina}" Classes="h2" />
+                        <TextBlock Classes="muted" FontSize="11.5"><Run Text="Caja  ›  " /><Run Text="{Binding TituloPagina}" /></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+
+                        <!-- Estado de conexión -->
+                        <Border Classes="badge verde" IsVisible="{Binding EnLinea}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Verde}" VerticalAlignment="Center" />
+                                <TextBlock Text="En línea" />
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="badge amarillo" IsVisible="{Binding SinConexion}"
+                                ToolTip.Tip="Las operaciones se guardan localmente y se enviarán automáticamente">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Ellipse Width="7" Height="7" Fill="{StaticResource Amarillo}" VerticalAlignment="Center" />
+                                <TextBlock Text="Sin conexión" />
+                                <TextBlock Text="·" />
+                                <TextBlock Text="{Binding TextoPendientes}" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Sesión -->
+                        <Border Background="{StaticResource AzulSuave}"
+                                CornerRadius="20"
+                                Padding="5,5,14,5">
+                            <StackPanel Orientation="Horizontal" Spacing="9">
+                                <Border Width="28" Height="28" CornerRadius="14"
+                                        Background="{StaticResource AzulPrimario}">
+                                    <TextBlock Text="{Binding Iniciales}"
+                                               Foreground="White" FontSize="11" FontWeight="Bold"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="{Binding TextoSesion}"
+                                           FontSize="12.5"
+                                           Foreground="{StaticResource Texto}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <Button Classes="ghost"
+                                Padding="14,8"
+                                FontSize="12.5"
+                                Command="{Binding CerrarSesionCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <PathIcon Data="{StaticResource IconoSalir}" Width="13" Height="13" />
+                                <TextBlock Text="Salir" />
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- PANTALLA ACTIVA -->
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ContentControl Content="{Binding CurrentPage}"
+                                Margin="28,26,28,36" />
+            </ScrollViewer>
+
+            <!-- PIE -->
+            <Border Grid.Row="2"
+                    Background="White"
+                    BorderBrush="{StaticResource Borde}"
+                    BorderThickness="0,1,0,0"
+                    Padding="28,11">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Classes="muted" FontSize="11.5"
+                               Text="CONAVIHSIDA — Sistema Integral de Gestión · Módulo Caja · 2026" />
+                    <TextBlock Grid.Column="1" Classes="muted" FontSize="11.5"
+                               Margin="24,0"
+                               HorizontalAlignment="Right"
+                               TextTrimming="CharacterEllipsis"
+                               Text="{Binding MensajeSincronizacion}" />
+                    <Grid Grid.Column="2" Width="48" Height="3" ColumnDefinitions="*,*,*" VerticalAlignment="Center">
+                        <Border Grid.Column="0" Background="{StaticResource AzulPrimario}" />
+                        <Border Grid.Column="1" Background="#DDE7EF" />
+                        <Border Grid.Column="2" Background="{StaticResource Rojo}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>

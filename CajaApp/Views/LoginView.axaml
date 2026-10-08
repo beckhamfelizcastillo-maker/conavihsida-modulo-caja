@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:CajaApp.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1320"
+             d:DesignHeight="840"
+             x:Class="CajaApp.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+
+    <Grid>
+
+        <!-- FONDO INSTITUCIONAL -->
+        <Image Source="avares://CajaApp/Assets/login-background-conavihsida.png"
+               Stretch="UniformToFill" />
+
+        <!-- TARJETA DE ACCESO (se desplaza si la pantalla es baja) -->
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+        <Border Width="400"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,20,64,20"
+                Background="#FCFFFFFF"
+                BorderBrush="{StaticResource Borde}"
+                BorderThickness="1"
+                CornerRadius="16"
+                ClipToBounds="True"
+                BoxShadow="0 12 40 0 #33163D63">
+
+            <Grid RowDefinitions="Auto,*,Auto">
+
+                <StackPanel Grid.Row="1" Margin="34,26,34,20" Spacing="0">
+
+                    <!-- LOGO COMPLETO -->
+                    <Image Source="avares://CajaApp/Assets/logo-completo.png"
+                           Height="70"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,16"
+                           RenderOptions.BitmapInterpolationMode="HighQuality" />
+
+                    <!-- ETIQUETA DE MÓDULO -->
+                    <Border Classes="badge" Margin="0,0,0,14">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Ellipse Width="7" Height="7" Fill="{StaticResource AzulPrimario}" VerticalAlignment="Center" />
+                            <TextBlock Text="Módulo Caja" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Sistema Integral de Gestión Institucional"
+                               FontSize="19"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource AzulOscuro}"
+                               TextWrapping="Wrap" />
+
+                    <TextBlock Text="CONAVIHSIDA · República Dominicana"
+                               Classes="sub"
+                               Margin="0,4,0,18" />
+
+                    <!-- USUARIO -->
+                    <TextBlock Classes="label" Text="Usuario" />
+                    <TextBox Text="{Binding Usuario}"
+                             PlaceholderText="nombre.usuario"
+                             Margin="0,0,0,14" />
+
+                    <!-- CONTRASEÑA -->
+                    <TextBlock Classes="label" Text="Contraseña" />
+                    <TextBox Text="{Binding Password}"
+                             PlaceholderText="••••••••"
+                             PasswordChar="●"
+                             Margin="0,0,0,18" />
+
+                    <!-- BOTÓN (Enter también inicia sesión) -->
+                    <Button Classes="primary"
+                            Content="Iniciar sesión"
+                            Command="{Binding LoginCommand}"
+                            IsDefault="True"
+                            HorizontalAlignment="Stretch"
+                            Padding="20,12" />
+
+                    <!-- RESULTADO -->
+                    <Border Classes="notice rojo"
+                            Margin="0,14,0,0"
+                            IsVisible="{Binding HayResultado}">
+                        <DockPanel>
+                            <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoInfo}" />
+                            <TextBlock Text="{Binding ResultadoLogin}" />
+                        </DockPanel>
+                    </Border>
+
+                    <!-- MODO DEMOSTRACIÓN -->
+                    <Border Classes="notice"
+                            Margin="0,14,0,0"
+                            IsVisible="{Binding EsModoDemo}">
+                        <DockPanel>
+                            <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoUsuario}" />
+                            <TextBlock><Run Text="Modo demostración — usuario: " /><Run Text="cajero" FontWeight="Bold" /><Run Text="  ·  contraseña: " /><Run Text="1234" FontWeight="Bold" /></TextBlock>
+                        </DockPanel>
+                    </Border>
+
+                    <Border Classes="divider" />
+
+                    <TextBlock Text="Acceso exclusivo para personal autorizado. Toda operación queda registrada en la bitácora de auditoría."
+                               FontSize="11.5"
+                               Foreground="{StaticResource TextoSuave}"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap" />
+
+                </StackPanel>
+
+                <!-- FRANJA TRICOLOR -->
+                <Grid Grid.Row="2" Height="4" ColumnDefinitions="*,*,*">
+                    <Border Grid.Column="0" Background="{StaticResource AzulPrimario}" />
+                    <Border Grid.Column="1" Background="White" />
+                    <Border Grid.Column="2" Background="{StaticResource Rojo}" />
+                </Grid>
+
+            </Grid>
+
+        </Border>
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

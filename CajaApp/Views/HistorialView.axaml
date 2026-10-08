@@ -1,0 +1,154 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CajaApp.ViewModels"
+             xmlns:items="using:CajaApp.ViewModels.Items"
+             x:Class="CajaApp.Views.HistorialView"
+             x:DataType="vm:HistorialViewModel">
+
+    <StackPanel>
+
+        <StackPanel Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="h1" Text="Historial de operaciones" />
+            <TextBlock Classes="sub" Text="Consulta las operaciones registradas y vuelve a abrir sus comprobantes. Cada reimpresión queda registrada." />
+        </StackPanel>
+
+        <!-- RESUMEN -->
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16" Margin="0,0,0,20">
+            <Border Classes="stat verde">
+                <StackPanel>
+                    <TextBlock Classes="statLabel" Text="Total cobrado (selección)" />
+                    <TextBlock Classes="statValue" Text="{Binding TotalCobrado}" />
+                    <TextBlock Classes="statSub" Text="{Binding Resumen}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="stat amarillo">
+                <StackPanel>
+                    <TextBlock Classes="statLabel" Text="Entregas subsidiadas" />
+                    <TextBlock Classes="statValue" Text="{Binding CantidadSubsidiadas}" />
+                    <TextBlock Classes="statSub" Text="Registradas con RD$ 0.00" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Classes="stat">
+                <StackPanel>
+                    <TextBlock Classes="statLabel" Text="Pendientes de sincronizar" />
+                    <TextBlock Classes="statValue" Text="{Binding CantidadPendientes}" />
+                    <TextBlock Classes="statSub" Text="Se envían a Integration automáticamente" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Classes="notice verde" Margin="0,0,0,16" IsVisible="{Binding MensajeExito}">
+            <DockPanel>
+                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoCheck}" />
+                <TextBlock Text="{Binding Mensaje}" />
+            </DockPanel>
+        </Border>
+        <Border Classes="notice rojo" Margin="0,0,0,16" IsVisible="{Binding MensajeError}">
+            <DockPanel>
+                <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                <TextBlock Text="{Binding Mensaje}" />
+            </DockPanel>
+        </Border>
+
+        <Border Classes="card">
+            <StackPanel>
+
+                <!-- FILTROS -->
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Margin="0,0,0,14">
+                    <TextBox Text="{Binding Filtro}"
+                             PlaceholderText="Buscar por número, cédula, servicio o forma de pago">
+                        <TextBox.InnerLeftContent>
+                            <PathIcon Data="{StaticResource IconoBuscar}" Width="15" Height="15"
+                                      Foreground="{StaticResource TextoSuave}" Margin="0,0,8,0" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <Border Grid.Column="1" CornerRadius="8" Background="{StaticResource AzulSuave}" Padding="3">
+                        <StackPanel Orientation="Horizontal" Spacing="3">
+                            <Button Content="Todas"
+                                    Classes="seg" Classes.on="{Binding TodasActivas}"
+                                    Command="{Binding VerTodasCommand}" />
+                            <Button Content="Turno actual"
+                                    Classes="seg" Classes.on="{Binding SoloTurnoActual}"
+                                    IsEnabled="{Binding HayTurnoAbierto}"
+                                    Command="{Binding VerTurnoCommand}" />
+                        </StackPanel>
+                    </Border>
+                    <Button Grid.Column="2" Classes="secondary" Command="{Binding ActualizarCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <PathIcon Data="{StaticResource IconoRefrescar}" />
+                            <TextBlock Text="Actualizar" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- TABLA -->
+                <Border Classes="thead">
+                    <Grid ColumnDefinitions="2*,1.75*,1.55*,2*,1.05*,1.55*,1.15*,1.15*,0.8*">
+                        <TextBlock Grid.Column="0" Classes="th" Text="NO." />
+                        <TextBlock Grid.Column="1" Classes="th" Text="FECHA" />
+                        <TextBlock Grid.Column="2" Classes="th" Text="CÉDULA" />
+                        <TextBlock Grid.Column="3" Classes="th" Text="SERVICIO" />
+                        <TextBlock Grid.Column="4" Classes="th" Text="PAGO" />
+                        <TextBlock Grid.Column="5" Classes="th" Text="MONTO" />
+                        <TextBlock Grid.Column="6" Classes="th" Text="TIPO" />
+                        <TextBlock Grid.Column="7" Classes="th" Text="SYNC" />
+                        <TextBlock Grid.Column="8" Classes="th" Text="" />
+                    </Grid>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Transacciones}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="items:TransaccionItem">
+                            <Border Classes="row">
+                                <Grid ColumnDefinitions="2*,1.75*,1.55*,2*,1.05*,1.55*,1.15*,1.15*,0.8*">
+                                    <TextBlock Grid.Column="0" Classes="td mono" FontSize="11.5" Text="{Binding Numero}" />
+                                    <TextBlock Grid.Column="1" Classes="td mono" FontSize="11.5" Text="{Binding FechaHora}" />
+                                    <TextBlock Grid.Column="2" Classes="td mono" FontSize="11.5" Text="{Binding Cedula}" />
+                                    <TextBlock Grid.Column="3" Classes="td" Text="{Binding Servicio}" />
+                                    <TextBlock Grid.Column="4" Classes="td" Text="{Binding FormaPago}" />
+                                    <TextBlock Grid.Column="5" Classes="td amount" FontSize="12.5" Text="{Binding Monto}" />
+                                    <Panel Grid.Column="6">
+                                        <Border Classes="badge verde" IsVisible="{Binding EsSubsidiado}">
+                                            <TextBlock Text="Subsidiado" />
+                                        </Border>
+                                        <Border Classes="badge" IsVisible="{Binding EsCobrado}">
+                                            <TextBlock Text="Cobrado" />
+                                        </Border>
+                                    </Panel>
+                                    <Panel Grid.Column="7">
+                                        <Border Classes="badge verde" IsVisible="{Binding Sincronizado}">
+                                            <TextBlock Text="Enviado" />
+                                        </Border>
+                                        <Border Classes="badge amarillo" IsVisible="{Binding Pendiente}">
+                                            <TextBlock Text="Pendiente" />
+                                        </Border>
+                                    </Panel>
+                                    <Button Grid.Column="8" Classes="link"
+                                            HorizontalAlignment="Right"
+                                            IsEnabled="{Binding TieneComprobante}"
+                                            ToolTip.Tip="Abrir o reimprimir el comprobante PDF"
+                                            Command="{Binding $parent[UserControl].((vm:HistorialViewModel)DataContext).ReimprimirCommand}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <PathIcon Data="{StaticResource IconoImpresora}" Width="13" Height="13" />
+                                            <TextBlock Text="PDF" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel IsVisible="{Binding SinResultados}" Margin="0,30,0,18" Spacing="8">
+                    <PathIcon Data="{StaticResource IconoLista}" Width="28" Height="28"
+                              Foreground="#B6C6D4" HorizontalAlignment="Center" />
+                    <TextBlock Classes="muted" FontSize="13" HorizontalAlignment="Center"
+                               Text="No hay operaciones que coincidan con la búsqueda." />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
+
+</UserControl>
