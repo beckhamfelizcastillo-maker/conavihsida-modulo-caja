@@ -12,6 +12,14 @@ namespace CajaApp.Services;
 
 public class TransaccionService : ITransaccionService
 {
+    /// <summary>Servicio que exige número de receta (descargo para Farmacia).</summary>
+    public const string ServicioMedicamentos = "Medicamentos ARV";
+
+    public const int LargoMaximoReceta = 50;
+
+    public static bool RequiereReceta(string? tipoServicio) =>
+        tipoServicio == ServicioMedicamentos;
+
     // ==========================================
     // REGISTRAR TRANSACCIÓN
     // ==========================================
@@ -22,7 +30,8 @@ public class TransaccionService : ITransaccionService
         decimal monto,
         string formaPago,
         bool esSubsidiado,
-        string usuarioCajero)
+        string usuarioCajero,
+        string? numeroReceta = null)
     {
         // ======================================
         // VALIDACIONES
@@ -59,6 +68,24 @@ public class TransaccionService : ITransaccionService
         {
             throw new ArgumentException(
                 "Debe seleccionar el tipo de servicio.");
+        }
+
+        numeroReceta =
+            string.IsNullOrWhiteSpace(numeroReceta)
+                ? null
+                : numeroReceta.Trim();
+
+        if (RequiereReceta(tipoServicio) &&
+            numeroReceta is null)
+        {
+            throw new ArgumentException(
+                "Debe ingresar el número de receta para la entrega de medicamentos.");
+        }
+
+        if (numeroReceta is { Length: > LargoMaximoReceta })
+        {
+            throw new ArgumentException(
+                $"El número de receta no puede superar {LargoMaximoReceta} caracteres.");
         }
 
         if (!esSubsidiado &&
@@ -189,7 +216,10 @@ public class TransaccionService : ITransaccionService
                     false,
 
                 UsuarioCajero =
-                    usuarioCajero
+                    usuarioCajero,
+
+                NumeroReceta =
+                    numeroReceta
             };
 
 

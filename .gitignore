@@ -13,3 +13,5 @@ TestResults/
 *.db-wal
 Logs/
 Comprobantes/
+Reportes/
+sesion-offline.json

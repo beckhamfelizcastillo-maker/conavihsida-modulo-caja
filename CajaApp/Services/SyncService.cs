@@ -347,7 +347,10 @@ public class SyncService : ISyncService
                         item.ComprobanteGenerado,
 
                     UsuarioCajero =
-                        item.UsuarioCajero
+                        item.UsuarioCajero,
+
+                    NumeroReceta =
+                        item.NumeroReceta
                 };
 
 

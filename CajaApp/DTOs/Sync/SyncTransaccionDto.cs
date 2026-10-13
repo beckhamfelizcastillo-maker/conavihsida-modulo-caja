@@ -25,4 +25,7 @@ public class SyncTransaccionDto
     public bool ComprobanteGenerado { get; set; }
 
     public string UsuarioCajero { get; set; } = string.Empty;
+
+    /// <summary>Número de receta del CORE (solo en entregas de medicamentos).</summary>
+    public string? NumeroReceta { get; set; }
 }

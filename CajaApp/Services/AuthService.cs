@@ -1,6 +1,7 @@
 ﻿using CajaApp.DTOs;
 using CajaApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using CajaApp.Helpers;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -57,8 +58,8 @@ public class AuthService : IAuthService
                     Token =
                         "TOKEN-DEMO-CAJA",
 
-                    Rol =
-                        "Cajero",
+                    Roles =
+                        new() { "Cajero" },
 
                     NombreCompleto =
                         "María Rosario",
@@ -103,6 +104,31 @@ public class AuthService : IAuthService
                     await response.Content
                         .ReadFromJsonAsync<LoginResponseDto>();
 
+                // Si el Gateway responde 200 con token pero sin el campo
+                // "exito", se considera un login correcto.
+                if (resultado is not null &&
+                    !resultado.Exito &&
+                    !string.IsNullOrWhiteSpace(resultado.Token))
+                {
+                    resultado.Exito = true;
+                }
+
+                // Guarda el acceso para poder entrar si luego se cae el servidor.
+                if (resultado is not null &&
+                    resultado.Exito &&
+                    RolesHelper.ResolverRolCaja(resultado.Rol, resultado.Roles) is not null)
+                {
+                    var roles = new System.Collections.Generic.List<string>(resultado.Rol);
+                    roles.AddRange(resultado.Roles);
+
+                    SesionOfflineStore.Guardar(
+                        usuario,
+                        password,
+                        resultado.NombreCompleto,
+                        roles,
+                        resultado.Token);
+                }
+
                 return resultado ??
                     new LoginResponseDto
                     {
@@ -113,6 +139,12 @@ public class AuthService : IAuthService
                     };
             }
 
+            // 5xx: Integración responde pero el CORE está caído → sin conexión.
+            if ((int)response.StatusCode >= 500)
+            {
+                return LoginSinConexion(usuario, password, $"el servidor respondió {(int)response.StatusCode}");
+            }
+
             return new LoginResponseDto
             {
                 Exito = false,
@@ -120,6 +152,10 @@ public class AuthService : IAuthService
                 Mensaje =
                     $"Credenciales inválidas o error del servidor ({response.StatusCode})."
             };
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            return LoginSinConexion(usuario, password, ex.Message);
         }
         catch (Exception ex)
         {
@@ -131,5 +167,42 @@ public class AuthService : IAuthService
                     $"No se pudo conectar con el servidor: {ex.Message}"
             };
         }
+    }
+
+
+    // ========================================
+    // OPERACIÓN CONTINUA: LOGIN SIN CONEXIÓN
+    // ========================================
+
+    private static LoginResponseDto LoginSinConexion(
+        string usuario,
+        string password,
+        string causa)
+    {
+        var guardada =
+            SesionOfflineStore.Validar(usuario, password);
+
+        if (guardada is null)
+        {
+            return new LoginResponseDto
+            {
+                Exito = false,
+
+                Mensaje =
+                    $"No se pudo conectar con el servidor ({causa}). " +
+                    "Sin conexión solo pueden entrar usuarios que ya iniciaron sesión en esta terminal en los últimos " +
+                    $"{SesionOfflineStore.DiasValidez} días."
+            };
+        }
+
+        return new LoginResponseDto
+        {
+            Exito = true,
+            SinConexion = true,
+            Token = guardada.Token,
+            Roles = guardada.Roles,
+            NombreCompleto = guardada.NombreCompleto,
+            Mensaje = "Sesión iniciada sin conexión. Las operaciones se sincronizarán al volver el servidor."
+        };
     }
 }

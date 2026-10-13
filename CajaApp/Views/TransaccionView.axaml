@@ -88,6 +88,16 @@
                               SelectedItem="{Binding TipoServicio}"
                               Margin="0,0,0,16" />
 
+                    <!-- RECETA (solo medicamentos: enlaza el descargo con Farmacia) -->
+                    <StackPanel IsVisible="{Binding RequiereReceta}" Margin="0,0,0,16">
+                        <TextBlock Classes="label" Text="Número de receta" />
+                        <TextBox Classes="mono"
+                                 Text="{Binding NumeroReceta}"
+                                 PlaceholderText="Número que aparece en la receta"
+                                 MaxLength="50" />
+                        <TextBlock Classes="hint" Text="Obligatorio para medicamentos. Farmacia solo despacha recetas descargadas en Caja." />
+                    </StackPanel>
+
                     <!-- MONTO Y FORMA DE PAGO -->
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="14" Margin="0,0,0,16">
                         <StackPanel>
@@ -182,6 +192,10 @@
                                 <Grid ColumnDefinitions="*,Auto" Margin="0,3">
                                     <TextBlock Classes="mono" FontSize="12.5" Text="Servicio" />
                                     <TextBlock Grid.Column="1" Classes="mono" FontSize="12.5" Text="{Binding TipoServicio}" />
+                                </Grid>
+                                <Grid ColumnDefinitions="*,Auto" Margin="0,3" IsVisible="{Binding RequiereReceta}">
+                                    <TextBlock Classes="mono" FontSize="12.5" Text="Receta" />
+                                    <TextBlock Grid.Column="1" Classes="mono" FontSize="12.5" Text="{Binding PreviewReceta}" />
                                 </Grid>
                                 <Grid ColumnDefinitions="*,Auto" Margin="0,3">
                                     <TextBlock Classes="mono" FontSize="12.5" Text="Forma de pago" />

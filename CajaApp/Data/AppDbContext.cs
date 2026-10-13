@@ -50,6 +50,51 @@ public class AppDbContext : DbContext
     }
 
 
+    /// <summary>
+    /// EnsureCreated no modifica una base que ya existe. Este método agrega
+    /// las columnas nuevas a un cajaapp.db creado con una versión anterior,
+    /// sin borrar los datos.
+    /// </summary>
+    public void AsegurarEsquema()
+    {
+        var conexion = Database.GetDbConnection();
+
+        bool abrir = conexion.State != System.Data.ConnectionState.Open;
+
+        if (abrir)
+        {
+            conexion.Open();
+        }
+
+        try
+        {
+            using var consulta = conexion.CreateCommand();
+
+            consulta.CommandText =
+                "SELECT COUNT(*) FROM pragma_table_info('Transacciones') WHERE name = 'NumeroReceta';";
+
+            bool existe = Convert.ToInt64(consulta.ExecuteScalar()) > 0;
+
+            if (!existe)
+            {
+                using var alter = conexion.CreateCommand();
+
+                alter.CommandText =
+                    "ALTER TABLE \"Transacciones\" ADD COLUMN \"NumeroReceta\" TEXT NULL;";
+
+                alter.ExecuteNonQuery();
+            }
+        }
+        finally
+        {
+            if (abrir)
+            {
+                conexion.Close();
+            }
+        }
+    }
+
+
     // ==========================================
     // MODELOS
     // ==========================================
@@ -115,6 +160,9 @@ public class AppDbContext : DbContext
 
             entity.Property(x => x.UsuarioCajero)
                 .IsRequired();
+
+            entity.Property(x => x.NumeroReceta)
+                .HasMaxLength(50);
         });
 
 

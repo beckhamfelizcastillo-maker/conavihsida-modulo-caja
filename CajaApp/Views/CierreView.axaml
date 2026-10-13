@@ -202,8 +202,16 @@
                 <TextBlock Classes="h2" FontSize="20" HorizontalAlignment="Center" Text="Turno cerrado correctamente" />
                 <TextBlock Classes="sub" TextAlignment="Center" Text="{Binding ResultadoCierre}" />
                 <TextBlock Classes="muted" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,10"
-                           Text="El cierre quedó registrado en la bitácora de auditoría y se sincronizará con Integration. Puedes abrir un nuevo turno cuando lo necesites." />
+                           Text="El cierre quedó registrado en la bitácora de auditoría y se sincronizará con Integration. El reporte de cuadre en PDF quedó guardado en la carpeta Reportes." />
+                <TextBlock Classes="sub" TextAlignment="Center" TextWrapping="Wrap" Foreground="{StaticResource RojoTexto}"
+                           IsVisible="{Binding HayMensaje}" Text="{Binding Mensaje}" />
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                    <Button Classes="secondary" Command="{Binding VerReporteCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <PathIcon Data="{StaticResource IconoImpresora}" Width="13" Height="13" />
+                            <TextBlock Text="Ver reporte de cuadre" />
+                        </StackPanel>
+                    </Button>
                     <Button Classes="secondary" Content="Ir a inicio" Command="{Binding IrInicioCommand}" />
                     <Button Classes="primary" Content="Abrir nueva caja" Command="{Binding NuevaAperturaCommand}" />
                 </StackPanel>

@@ -1,4 +1,5 @@
-﻿using CajaApp.Services.Interfaces;
+﻿using CajaApp.Helpers;
+using CajaApp.Services.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Threading.Tasks;
@@ -119,17 +120,26 @@ public partial class LoginViewModel : ViewModelBase
                 return;
             }
 
-            // Validar rol
-            if (resultado.Rol != "Cajero" &&
-                resultado.Rol != "Administrador" &&
-                resultado.Rol != "Auditor")
+            // Validar rol: el CORE puede devolver varios; Caja usa uno
+            // (prioridad Administrador > Cajero > Auditor).
+            var rol =
+                RolesHelper.ResolverRolCaja(
+                    resultado.Rol,
+                    resultado.Roles);
+
+            if (rol is null)
             {
                 ResultadoLogin =
                     "Su usuario no tiene permisos para acceder al módulo de Caja.";
 
+                var recibidos =
+                    string.Join(", ", resultado.Rol) +
+                    (resultado.Rol.Count > 0 && resultado.Roles.Count > 0 ? ", " : string.Empty) +
+                    string.Join(", ", resultado.Roles);
+
                 _auditService.Advertencia(
                     EventosAuditoria.Login,
-                    $"Acceso denegado por rol '{resultado.Rol}' para '{Usuario.Trim()}'.");
+                    $"Acceso denegado por rol '{recibidos}' para '{Usuario.Trim()}'.");
 
                 return;
             }
@@ -142,7 +152,7 @@ public partial class LoginViewModel : ViewModelBase
                 resultado.NombreCompleto;
 
             _sessionService.Rol =
-                resultado.Rol;
+                rol;
 
             _sessionService.Token =
                 resultado.Token;
@@ -152,7 +162,8 @@ public partial class LoginViewModel : ViewModelBase
 
             _auditService.Info(
                 EventosAuditoria.Login,
-                $"Inicio de sesión correcto. Rol: {resultado.Rol}.");
+                $"Inicio de sesión correcto. Rol: {rol}." +
+                (resultado.SinConexion ? " Validado sin conexión (operación continua)." : string.Empty));
 
             // No se conserva la contraseña en memoria.
             Password = string.Empty;

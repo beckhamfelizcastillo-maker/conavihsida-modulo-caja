@@ -43,3 +43,21 @@ Copia de seguridad del estado anterior: `D:\Desarrollo3Caja\_respaldo_antes_redi
 - **Login más compacto:** la tarjeta cabe en pantallas bajas y, si aun así no cabe, se puede desplazar.
 - **Nueva sección "Preguntas frecuentes"** (barra lateral, apartado Ayuda): 24 preguntas en 7 temas, con búsqueda (sin importar tildes) y filtro por tema.
 - Se quitaron los paneles explicativos de Apertura, Validar subsidio y Nueva transacción; su contenido ahora está en Preguntas frecuentes.
+
+# Integración con el CORE (12 de octubre de 2026)
+
+Copia de seguridad de los archivos modificados: `D:\Desarrollo3Caja\_respaldo_antes_integracion_core`.
+
+- **Número de receta:** nuevo campo `NumeroReceta` en la transacción y en `SyncTransaccionDto`. En Nueva transacción aparece "Número de receta" al elegir *Medicamentos ARV* (obligatorio, máx. 50 caracteres). Se muestra en la vista previa, en el PDF y en la auditoría. Con él, Farmacia sabe que la receta ya pasó por Caja.
+- **Base existente:** `AppDbContext.AsegurarEsquema()` agrega la columna `NumeroReceta` a un `cajaapp.db` anterior al iniciar la app, sin borrar datos.
+- **Lista de roles:** el login acepta `roles` (lista) o `rol` (texto o lista). Con varios roles entra con Administrador → Cajero → Auditor (`RolesHelper`). Un `200` con token sin campo `exito` se toma como login correcto.
+- **Comprobantes con prefijo de terminal:** `CJ01-000001`, `CJ01-000002`… en vez de `REC-fecha`. Prefijo configurable en `appsettings.json` → `Caja:Terminal`.
+- **Subsidio contra el Gateway:** nuevo `ApiService` (`GET /pacientes/{cedula}/subsidio`). Se activa con `ApiSettings:UseMockSubsidio: false`; con `true` sigue usando la tabla local de demostración.
+- **Pruebas:** 16 nuevas en `IntegracionCoreTests` (56 en total, todas correctas).
+
+# Requisitos del profesor (13 de octubre de 2026)
+
+- **Reporte de cuadre en PDF:** al cerrar el turno se genera `Reportes/Cuadre-<turno>.pdf` con balance inicial, cobros en efectivo y tarjeta, entregas subsidiadas, efectivo esperado, efectivo contado, diferencia (exacto / sobrante / faltante), observación, detalle de operaciones y firmas. Botón "Ver reporte de cuadre" en la pantalla de cierre.
+- **Login sin conexión (operación continua):** después de cada login correcto en línea se guarda el usuario con un hash PBKDF2 de la contraseña (`sesion-offline.json`, nunca la contraseña). Si el Gateway o el CORE no responden (sin red, tiempo agotado o error 5xx), solo puede entrar un usuario que ya inició sesión en esa terminal durante los últimos 7 días. Tiempo de espera del login: 5 segundos.
+- **Subsidio sin conexión:** cada validación en línea guarda el último resultado en la tabla local `Pacientes` (sin datos clínicos). Si el servidor no responde, Caja usa ese dato e indica "validado sin conexión". Si la cédula no está guardada, se cobra normalmente con el aviso correspondiente.
+- **Pruebas:** 8 nuevas en `OperacionContinuaTests` (64 en total, todas correctas).

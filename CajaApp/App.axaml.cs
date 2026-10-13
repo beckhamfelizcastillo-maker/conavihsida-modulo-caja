@@ -42,6 +42,9 @@ public partial class App : Application
         using (var db = new AppDbContext())
         {
             db.Database.EnsureCreated();
+
+            // Agrega columnas nuevas (p. ej. NumeroReceta) a una base existente.
+            db.AsegurarEsquema();
         }
 
 
@@ -57,6 +60,12 @@ public partial class App : Application
                     "appsettings.json",
                     optional: true)
                 .Build();
+
+
+        // Prefijo de numeración de comprobantes de esta terminal.
+        ComprobanteService.PrefijoTerminal =
+            ComprobanteService.NormalizarPrefijo(
+                configuration["Caja:Terminal"]);
 
 
         // ==========================================
@@ -77,16 +86,38 @@ public partial class App : Application
 
         services.AddHttpClient<
             IAuthService,
-            AuthService>();
+            AuthService>(
+                client =>
+                {
+                    // Corto: si el servidor no responde, se pasa al login sin conexión.
+                    client.Timeout =
+                        TimeSpan.FromSeconds(5);
+                });
 
 
         // ==========================================
         // API TEMPORAL DE SUBSIDIOS
         // ==========================================
 
-        services.AddSingleton<
-            IApiService,
-            MockApiService>();
+        // UseMockSubsidio = true  → consulta la tabla Pacientes local (demo).
+        // UseMockSubsidio = false → consulta el Gateway (regla del CORE).
+        if (configuration.GetValue("ApiSettings:UseMockSubsidio", true))
+        {
+            services.AddSingleton<
+                IApiService,
+                MockApiService>();
+        }
+        else
+        {
+            services.AddHttpClient<
+                IApiService,
+                ApiService>(
+                    client =>
+                    {
+                        client.Timeout =
+                            TimeSpan.FromSeconds(5);
+                    });
+        }
 
 
         // ==========================================

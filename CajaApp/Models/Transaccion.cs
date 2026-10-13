@@ -30,4 +30,10 @@ public class Transaccion
     public bool ComprobanteGenerado { get; set; } = false;
     public bool Sincronizado { get; set; } = false;
     public string UsuarioCajero { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Número de receta del CORE. Enlaza el descargo en Caja con el despacho
+    /// en Farmacia. Obligatorio para "Medicamentos ARV"; vacío en los demás servicios.
+    /// </summary>
+    public string? NumeroReceta { get; set; }
 }

@@ -7,12 +7,77 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CajaApp.Services;
 
 public class ComprobanteService : IComprobanteService
 {
+    // ==========================================
+    // NUMERACIÓN POR TERMINAL
+    // ==========================================
+
+    public const string PrefijoPorDefecto = "CJ01";
+
+    /// <summary>
+    /// Prefijo de esta terminal (appsettings: Caja:Terminal). Los comprobantes
+    /// de ventanilla se numeran CJ01-000001, CJ01-000002... para que nunca
+    /// choquen con los REC-n / FAC-n que emite el CORE para el Portal Web,
+    /// ni con los de otra terminal. La numeración es local: funciona sin conexión.
+    /// </summary>
+    public static string PrefijoTerminal { get; set; } = PrefijoPorDefecto;
+
+    /// <summary>Deja solo letras y dígitos en mayúscula (máx. 10). Vacío → CJ01.</summary>
+    public static string NormalizarPrefijo(string? valor)
+    {
+        var limpio = new StringBuilder();
+
+        foreach (char c in valor ?? string.Empty)
+        {
+            if (char.IsAsciiLetterOrDigit(c))
+            {
+                limpio.Append(char.ToUpperInvariant(c));
+            }
+        }
+
+        if (limpio.Length == 0)
+        {
+            return PrefijoPorDefecto;
+        }
+
+        return limpio.Length > 10
+            ? limpio.ToString(0, 10)
+            : limpio.ToString();
+    }
+
+    private static async Task<string> GenerarNumeroAsync(
+        AppDbContext db)
+    {
+        string prefijo = $"{PrefijoTerminal}-";
+
+        var existentes =
+            await db.Comprobantes
+                .AsNoTracking()
+                .Where(x => x.NumeroComprobante.StartsWith(prefijo))
+                .Select(x => x.NumeroComprobante)
+                .ToListAsync();
+
+        int ultimo = 0;
+
+        foreach (var numero in existentes)
+        {
+            if (int.TryParse(numero.AsSpan(prefijo.Length), out int valor) &&
+                valor > ultimo)
+            {
+                ultimo = valor;
+            }
+        }
+
+        return $"{prefijo}{ultimo + 1:D6}";
+    }
+
     public async Task<Comprobante> GenerarAsync(
         int transaccionId)
     {
@@ -52,7 +117,7 @@ public class ComprobanteService : IComprobanteService
         // ======================================
 
         var numeroComprobante =
-            $"REC-{DateTime.Now:yyyyMMdd-HHmmssfff}";
+            await GenerarNumeroAsync(db);
 
 
         // ======================================
@@ -258,6 +323,13 @@ public class ComprobanteService : IComprobanteService
                         column.Item()
                             .Text(
                                 $"Servicio: {transaccion.TipoServicio}");
+
+                        if (!string.IsNullOrWhiteSpace(transaccion.NumeroReceta))
+                        {
+                            column.Item()
+                                .Text(
+                                    $"Receta: {transaccion.NumeroReceta}");
+                        }
 
 
                         // ----------------------
@@ -473,7 +545,7 @@ public class ComprobanteService : IComprobanteService
     /// Lee el logo desde los recursos de Avalonia. Si no está disponible
     /// (por ejemplo, en pruebas automáticas) el PDF usa el encabezado de texto.
     /// </summary>
-    private static byte[]? ObtenerLogo()
+    internal static byte[]? ObtenerLogo()
     {
         if (_logo is not null)
         {

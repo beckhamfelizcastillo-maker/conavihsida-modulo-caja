@@ -6,13 +6,19 @@ Documento para el equipo de **Integration** (Ricardo). Describe los endpoints qu
 {
   "ApiSettings": {
     "BaseUrl": "https://localhost:5001/api",
-    "UseMockAuthentication": true
+    "UseMockAuthentication": true,
+    "UseMockSubsidio": true
+  },
+  "Caja": {
+    "Terminal": "CJ01"
   }
 }
 ```
 
 - Mientras `UseMockAuthentication` sea `true`, el login no llama a Integration (usuario de demostración `cajero` / `1234`).
-- Para conectar con Integration real: poner la URL correcta en `BaseUrl` y cambiar `UseMockAuthentication` a `false`.
+- Mientras `UseMockSubsidio` sea `true`, la validación de subsidio consulta la tabla `Pacientes` local (datos de demostración).
+- Para la prueba conjunta con el Gateway: poner la URL correcta en `BaseUrl` y cambiar **ambas** banderas a `false`. Entonces el login usa `cajero.prueba` del CORE y el subsidio aplica la regla del CORE.
+- `Caja:Terminal` es el prefijo de numeración de los comprobantes de esta terminal (ver sección 5).
 
 Convenciones:
 
@@ -40,13 +46,16 @@ Respuesta `200 OK`:
 {
   "exito": true,
   "token": "eyJhbGciOi...",
-  "rol": "Cajero",
+  "roles": ["Farmacia", "Cajero"],
   "nombreCompleto": "María Rosario",
   "mensaje": "Autenticación correcta."
 }
 ```
 
-- Roles aceptados por Caja: `Cajero`, `Administrador`, `Auditor`. Cualquier otro rol es rechazado.
+- Caja acepta `roles` (lista, formato del CORE) o `rol` (texto o lista, formato anterior).
+- Si el usuario tiene varios roles, Caja entra con uno solo, por prioridad: `Administrador` (también `Admin`) → `Cajero` → `Auditor`. No distingue mayúsculas.
+- Los demás roles (Farmacia, Médico, etc.) se ignoran. Si no queda ninguno de los tres, el acceso se niega.
+- Si la respuesta es `200` con `token` pero sin el campo `exito`, se considera login correcto.
 - Credenciales incorrectas: `401` o `200` con `"exito": false` y un `mensaje`.
 - Pendiente de acordar: claims del JWT (`sub`, `role`, `exp`) y duración del token.
 
@@ -58,7 +67,20 @@ Respuesta `200 OK`:
 
 Hoy Caja usa una implementación local (`MockApiService`) que consulta la tabla `Pacientes` de SQLite. Endpoint propuesto para reemplazarla:
 
-`GET {BaseUrl}/pacientes/{cedula}/subsidio` — `cedula` en formato `000-0000000-0`.
+`GET {BaseUrl}/pacientes/{cedula}/subsidio` — `cedula` en formato `000-0000000-0`. Lleva `Authorization: Bearer <token>`. Implementado en `ApiService` (se activa con `UseMockSubsidio: false`).
+
+Nombres exactos que lee Caja (camelCase):
+
+| Campo | Tipo | Regla acordada con el CORE (RN-02) |
+|---|---|---|
+| `encontrado` | bool | `true` si la cédula existe |
+| `tieneSubsidio` | bool | `true` si el expediente está activo |
+| `porcentaje` | decimal | `100` |
+| `vigente` | bool | `true` si el expediente está activo. **Obligatorio:** sin `vigente: true` Caja cobra normalmente |
+| `vigenciaHasta` | fecha o `null` | `null` (sin vencimiento) |
+| `mensaje` | texto | `"Subsidio activo."`, `"Expediente inactivo."`, etc. |
+
+Ejemplo con la regla del CORE:
 
 ```json
 {
@@ -66,10 +88,13 @@ Hoy Caja usa una implementación local (`MockApiService`) que consulta la tabla 
   "tieneSubsidio": true,
   "porcentaje": 100,
   "vigente": true,
-  "vigenciaHasta": "2027-12-31T00:00:00",
+  "vigenciaHasta": null,
   "mensaje": "Subsidio activo."
 }
 ```
+
+- Cédula inexistente: `404` o `200` con `"encontrado": false`.
+- Cualquier otro error: Caja muestra el aviso y no aplica gratuidad.
 
 **Importante (RN-01 / RN-03):** la respuesta no debe incluir diagnóstico, carga viral, CD4 ni ningún dato clínico.
 
@@ -99,9 +124,11 @@ Si `exito` es `false` o el código no es 2xx, el registro queda pendiente y se r
 
 **SyncMovimientoCajaDto:** `idLocal`, `turnoCajaIdLocal`, `numeroMovimiento`, `fecha`, `tipo` (`Entrada`, `Salida`, `Cobro`, `Subsidio`, `Ajuste`), `monto`, `concepto`, `referencia` (número de transacción), `usuarioCajero`.
 
-**SyncTransaccionDto:** `idLocal`, `numeroTransaccion`, `fecha`, `cedulaPaciente`, `tipoServicio`, `monto`, `formaPago` (`Efectivo`, `Tarjeta`, `Subsidiado`), `esSubsidiado`, `estado` (`Pendiente`, `Completada`, `Anulada`), `comprobanteGenerado`, `usuarioCajero`.
+**SyncTransaccionDto:** `idLocal`, `numeroTransaccion`, `fecha`, `cedulaPaciente`, `tipoServicio`, `monto`, `formaPago` (`Efectivo`, `Tarjeta`, `Subsidiado`), `esSubsidiado`, `estado` (`Pendiente`, `Completada`, `Anulada`), `comprobanteGenerado`, `usuarioCajero`, `numeroReceta`.
 
-**SyncComprobanteDto:** `idLocal`, `transaccionIdLocal`, `numeroComprobante`, `fechaGeneracion`, `tipoDocumento` (`RECIBO`), `esReimpresion`, `cantidadReimpresiones`. Se envían los metadatos; el PDF queda en la terminal.
+- `numeroReceta` (texto, máx. 50, puede ser `null`): obligatorio cuando `tipoServicio` es `Medicamentos ARV`; `null` en los demás servicios. El CORE lo usa para marcar la receta como descargada y habilitar el despacho en Farmacia. Mientras la terminal esté sin conexión, la receta sigue "pendiente de descargo" hasta que llegue la sincronización.
+
+**SyncComprobanteDto:** `idLocal`, `transaccionIdLocal`, `numeroComprobante`, `fechaGeneracion`, `tipoDocumento` (`RECIBO DE CAJA` o `CONSTANCIA DE ENTREGA`), `esReimpresion`, `cantidadReimpresiones`. Se envían los metadatos; el PDF queda en la terminal.
 
 **SyncFondoConvenioDto:** `idLocal`, `codigo`, `nombre`, `tipoFuente` (`PresupuestoEstatal`, `DonacionInternacional`), `organismo`, `montoAsignado`, `montoUtilizado`, `fechaInicio`, `fechaFin`, `activo`.
 
@@ -109,3 +136,10 @@ Si `exito` es `false` o el código no es 2xx, el registro queda pendiente y se r
 
 - **Idempotencia:** usar los números de negocio como clave única (`numeroTurno`, `numeroMovimiento`, `numeroTransaccion`, `numeroComprobante`, `codigo`). Si llega un registro repetido, responder `exito: true` sin duplicarlo; así un reintento después de un corte de red no crea duplicados.
 - Los `idLocal` son identificadores de la base SQLite de cada terminal: no deben usarse como clave en el Core.
+
+## 5. Numeración de comprobantes
+
+- Los comprobantes de ventanilla usan `<terminal>-<correlativo de 6 dígitos>`: `CJ01-000001`, `CJ01-000002`…
+- Es una serie separada de los `REC-n` / `FAC-n` que emite el CORE para el Portal Web. No comparten numeración porque Caja emite comprobantes sin conexión.
+- Cada terminal configura su prefijo en `Caja:Terminal` (solo letras y dígitos, máx. 10). Dos terminales no deben usar el mismo prefijo.
+- `numeroComprobante` es único y sirve como clave de idempotencia en el CORE.

@@ -1,8 +1,11 @@
 using CajaApp.Helpers;
 using CajaApp.Models;
+using CajaApp.Services;
 using CajaApp.Services.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,6 +43,9 @@ public partial class CierreViewModel : ViewModelBase
     private string _resultadoCierre = string.Empty;
     private bool _cierreConDiferencia;
     private bool _isLoading;
+    private int? _ultimoTurnoCerradoId;
+    private string _rutaReporte = string.Empty;
+    private readonly ReporteCuadreService _reporteCuadre = new();
 
     // ==========================================
     // DATOS DEL TURNO
@@ -226,6 +232,7 @@ public partial class CierreViewModel : ViewModelBase
     public IRelayCommand NuevaAperturaCommand { get; }
     public IRelayCommand IrInicioCommand { get; }
     public IRelayCommand UsarEsperadoCommand { get; }
+    public IAsyncRelayCommand VerReporteCommand { get; }
 
     public CierreViewModel(
         ICajaService cajaService,
@@ -246,6 +253,7 @@ public partial class CierreViewModel : ViewModelBase
         IrInicioCommand = new RelayCommand(() => _navegacion.Ir(PaginaCaja.Inicio));
         UsarEsperadoCommand = new RelayCommand(() =>
             EfectivoDeclaradoTexto = Formato.MontoEditable(EfectivoEsperado));
+        VerReporteCommand = new AsyncRelayCommand(VerReporteAsync);
     }
 
     // ==========================================
@@ -362,6 +370,10 @@ public partial class CierreViewModel : ViewModelBase
             TurnoCerrado = true;
             HayTurnoAbierto = false;
             _turnoActual = null;
+
+            // Reporte de cuadre en PDF (funciona sin conexión).
+            _ultimoTurnoCerradoId = turnoCerrado.Id;
+            await GenerarReporteAsync();
             EfectivoDeclaradoTexto = string.Empty;
             Observacion = string.Empty;
 
@@ -375,6 +387,60 @@ public partial class CierreViewModel : ViewModelBase
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    // ==========================================
+    // REPORTE DE CUADRE (PDF)
+    // ==========================================
+
+    private async Task GenerarReporteAsync()
+    {
+        if (_ultimoTurnoCerradoId is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _rutaReporte = await _reporteCuadre.GenerarAsync(_ultimoTurnoCerradoId.Value);
+
+            _auditService.Info(
+                EventosAuditoria.CierreCaja,
+                $"Reporte de cuadre generado: {Path.GetFileName(_rutaReporte)}.");
+        }
+        catch (Exception ex)
+        {
+            _rutaReporte = string.Empty;
+            Mensaje = $"El turno se cerró, pero no se pudo generar el reporte de cuadre: {ex.Message}";
+            _auditService.Error(EventosAuditoria.CierreCaja, "Error al generar el reporte de cuadre.", ex);
+        }
+    }
+
+    private async Task VerReporteAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_rutaReporte) || !File.Exists(_rutaReporte))
+        {
+            await GenerarReporteAsync();
+        }
+
+        if (string.IsNullOrWhiteSpace(_rutaReporte) || !File.Exists(_rutaReporte))
+        {
+            Mensaje = "No se encontró el reporte de cuadre.";
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _rutaReporte,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"No se pudo abrir el reporte: {ex.Message}";
         }
     }
 

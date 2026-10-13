@@ -1,4 +1,5 @@
 using CajaApp.Helpers;
+using CajaApp.Services;
 using CajaApp.Services.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -26,6 +27,7 @@ public partial class TransaccionViewModel : ViewModelBase
     private string _tipoServicio = "Consulta médica";
     private string _montoTexto = "300";
     private string _formaPago = "Efectivo";
+    private string _numeroReceta = string.Empty;
     private bool _esSubsidiado;
     private string _cedulaValidada = string.Empty;
     private EstadoValidacion _estadoValidacion = EstadoValidacion.SinValidar;
@@ -108,9 +110,28 @@ public partial class TransaccionViewModel : ViewModelBase
                 }
 
                 OnPropertyChanged(nameof(EsArvSinSubsidio));
+                OnPropertyChanged(nameof(RequiereReceta));
             }
         }
     }
+
+    /// <summary>
+    /// Número de receta del CORE. Se pide solo para medicamentos: con él,
+    /// Farmacia sabe que la receta ya pasó por Caja.
+    /// </summary>
+    public string NumeroReceta
+    {
+        get => _numeroReceta;
+        set
+        {
+            if (SetProperty(ref _numeroReceta, value))
+            {
+                OnPropertyChanged(nameof(PreviewReceta));
+            }
+        }
+    }
+
+    public bool RequiereReceta => TransaccionService.RequiereReceta(TipoServicio);
 
     public string MontoTexto
     {
@@ -205,6 +226,10 @@ public partial class TransaccionViewModel : ViewModelBase
         : "—";
 
     public string PreviewPago => EsSubsidiado ? "Subsidiado" : FormaPago;
+
+    public string PreviewReceta => string.IsNullOrWhiteSpace(NumeroReceta)
+        ? "—"
+        : NumeroReceta.Trim();
 
     public string PreviewFecha => Formato.FechaHora(DateTime.Now);
 
@@ -331,15 +356,16 @@ public partial class TransaccionViewModel : ViewModelBase
             {
                 _estadoValidacion = EstadoValidacion.Activo;
                 EsSubsidiado = true;
-                DetalleSubsidio = resultado.VigenciaHasta.HasValue
+                DetalleSubsidio = (resultado.VigenciaHasta.HasValue
                     ? $"Cobertura {resultado.Porcentaje:N0}% vigente hasta {Formato.Fecha(resultado.VigenciaHasta.Value)}. El total se ajusta a RD$ 0.00."
-                    : $"Cobertura {resultado.Porcentaje:N0}% sin fecha límite. El total se ajusta a RD$ 0.00.";
+                    : $"Cobertura {resultado.Porcentaje:N0}% sin fecha límite. El total se ajusta a RD$ 0.00.") +
+                    (resultado.SinConexion ? " Validado sin conexión con el último dato guardado." : string.Empty);
             }
             else
             {
                 _estadoValidacion = EstadoValidacion.NoDisponible;
                 EsSubsidiado = false;
-                DetalleSubsidio = resultado.Encontrado
+                DetalleSubsidio = resultado.Encontrado || resultado.SinConexion
                     ? $"{resultado.Mensaje} La operación se cobra normalmente."
                     : "Cédula no registrada en el padrón de subsidios. La operación se cobra normalmente.";
             }
@@ -386,6 +412,12 @@ public partial class TransaccionViewModel : ViewModelBase
             return;
         }
 
+        if (RequiereReceta && string.IsNullOrWhiteSpace(NumeroReceta))
+        {
+            MostrarMensaje("Escribe el número de receta para registrar la entrega de medicamentos.", TipoMensaje.Error);
+            return;
+        }
+
         decimal monto = 0m;
 
         if (!EsSubsidiado)
@@ -426,13 +458,15 @@ public partial class TransaccionViewModel : ViewModelBase
                 monto,
                 FormaPago,
                 esSubsidiado,
-                _sessionService.Usuario);
+                _sessionService.Usuario,
+                RequiereReceta ? NumeroReceta : null);
 
             _auditService.Info(
                 EventosAuditoria.Transaccion,
                 $"Transacción {transaccion.NumeroTransaccion} registrada. Servicio: {transaccion.TipoServicio}. " +
                 $"Pago: {(esSubsidiado ? "Subsidiado" : FormaPago)}. Monto: {Formato.Moneda(transaccion.Monto)}. " +
-                $"Beneficiario: {CedulaHelper.Enmascarar(transaccion.CedulaPaciente)}.");
+                $"Beneficiario: {CedulaHelper.Enmascarar(transaccion.CedulaPaciente)}." +
+                (transaccion.NumeroReceta is null ? string.Empty : $" Receta: {transaccion.NumeroReceta}."));
 
             // RN-05: toda operación termina con su comprobante.
             var comprobante = await _comprobanteService.GenerarAsync(transaccion.Id);
@@ -528,6 +562,7 @@ public partial class TransaccionViewModel : ViewModelBase
         Cedula = string.Empty;
         ReiniciarValidacion();
         TipoServicio = "Consulta médica";
+        NumeroReceta = string.Empty;
         MontoTexto = "300";
         FormaPago = "Efectivo";
         OnPropertyChanged(nameof(PreviewFecha));

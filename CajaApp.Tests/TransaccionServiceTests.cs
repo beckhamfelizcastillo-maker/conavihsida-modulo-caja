@@ -24,7 +24,7 @@ public class TransaccionServiceTests : BaseDatosPrueba
     {
         await _caja.AbrirCajaAsync("cajero", "María Rosario", "Ventanilla 1", 5000m, "");
 
-        var t = await _transacciones.RegistrarAsync("00112345678", "Medicamentos ARV", 1500m, "Efectivo", true, "cajero");
+        var t = await _transacciones.RegistrarAsync("00112345678", "Medicamentos ARV", 1500m, "Efectivo", true, "cajero", "RX-1001");
 
         Assert.Equal(0m, t.Monto);
         Assert.Equal(FormaPago.Subsidiado, t.FormaPago);

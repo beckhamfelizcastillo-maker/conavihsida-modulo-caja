@@ -12,7 +12,8 @@ public interface ITransaccionService
         decimal monto,
         string formaPago,
         bool esSubsidiado,
-        string usuarioCajero);
+        string usuarioCajero,
+        string? numeroReceta = null);
 
     Task<List<Transaccion>> ObtenerHistorialAsync();
 
