@@ -61,3 +61,10 @@ Copia de seguridad de los archivos modificados: `D:\Desarrollo3Caja\_respaldo_an
 - **Login sin conexión (operación continua):** después de cada login correcto en línea se guarda el usuario con un hash PBKDF2 de la contraseña (`sesion-offline.json`, nunca la contraseña). Si el Gateway o el CORE no responden (sin red, tiempo agotado o error 5xx), solo puede entrar un usuario que ya inició sesión en esa terminal durante los últimos 7 días. Tiempo de espera del login: 5 segundos.
 - **Subsidio sin conexión:** cada validación en línea guarda el último resultado en la tabla local `Pacientes` (sin datos clínicos). Si el servidor no responde, Caja usa ese dato e indica "validado sin conexión". Si la cédula no está guardada, se cobra normalmente con el aviso correspondiente.
 - **Pruebas:** 8 nuevas en `OperacionContinuaTests` (64 en total, todas correctas).
+
+# Conexión al Gateway real de Integración (13 de octubre de 2026)
+
+- `appsettings.json` apunta al Gateway: `BaseUrl` = `https://localhost:7107/api`, `UseMockAuthentication` y `UseMockSubsidio` en `false`. Usuario de prueba: `cajero.prueba`.
+- **`numeroReceta` = id numérico del CORE.** Caja acepta `15`, `REC-15`, `#15` y guarda/envía `15`; rechaza textos que no sean un número de receta. La sincronización también corrige valores antiguos antes de enviarlos.
+- **Token vencido (8 h):** si el Gateway responde 401 en la sincronización o en el subsidio, la barra lateral avisa "La sesión venció: cierra sesión y vuelve a entrar…". Los registros siguen pendientes y se envían al volver a entrar.
+- **Pruebas:** 9 nuevas (73 en total, todas correctas).

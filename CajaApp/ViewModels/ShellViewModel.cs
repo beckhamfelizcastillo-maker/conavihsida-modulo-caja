@@ -467,6 +467,11 @@ public partial class ShellViewModel : ViewModelBase
                 ? "Modo sin conexión. No hay registros pendientes."
                 : $"Modo sin conexión. {estado.TotalPendientes} registro(s) se enviarán cuando Integration esté disponible.";
         }
+        else if (_sessionService.TokenRechazado && estado.TotalPendientes > 0)
+        {
+            MensajeSincronizacion =
+                $"La sesión venció: cierra sesión y vuelve a entrar para enviar {estado.TotalPendientes} registro(s).";
+        }
         else if (estado.TotalPendientes == 0)
         {
             MensajeSincronizacion = "Todos los datos están sincronizados.";

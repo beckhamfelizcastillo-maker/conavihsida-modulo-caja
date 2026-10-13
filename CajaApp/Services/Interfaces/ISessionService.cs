@@ -12,5 +12,8 @@ public interface ISessionService
 
     bool EstaAutenticado { get; }
 
+    /// <summary>true cuando el Gateway rechazó el token (401): hay que volver a iniciar sesión.</summary>
+    bool TokenRechazado { get; set; }
+
     void CerrarSesion();
 }

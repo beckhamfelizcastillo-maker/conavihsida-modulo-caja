@@ -5,9 +5,9 @@ Documento para el equipo de **Integration** (Ricardo). Describe los endpoints qu
 ```json
 {
   "ApiSettings": {
-    "BaseUrl": "https://localhost:5001/api",
-    "UseMockAuthentication": true,
-    "UseMockSubsidio": true
+    "BaseUrl": "https://localhost:7107/api",
+    "UseMockAuthentication": false,
+    "UseMockSubsidio": false
   },
   "Caja": {
     "Terminal": "CJ01"
@@ -126,7 +126,7 @@ Si `exito` es `false` o el código no es 2xx, el registro queda pendiente y se r
 
 **SyncTransaccionDto:** `idLocal`, `numeroTransaccion`, `fecha`, `cedulaPaciente`, `tipoServicio`, `monto`, `formaPago` (`Efectivo`, `Tarjeta`, `Subsidiado`), `esSubsidiado`, `estado` (`Pendiente`, `Completada`, `Anulada`), `comprobanteGenerado`, `usuarioCajero`, `numeroReceta`.
 
-- `numeroReceta` (texto, máx. 50, puede ser `null`): obligatorio cuando `tipoServicio` es `Medicamentos ARV`; `null` en los demás servicios. El CORE lo usa para marcar la receta como descargada y habilitar el despacho en Farmacia. Mientras la terminal esté sin conexión, la receta sigue "pendiente de descargo" hasta que llegue la sincronización.
+- `numeroReceta` (texto con el **id numérico** de la receta del CORE, por ejemplo `"15"`; puede ser `null`): obligatorio cuando `tipoServicio` es `Medicamentos ARV`; `null` en los demás servicios. Si el cajero escribe `REC-15`, Caja envía `15` (el CORE responde 400 a `"REC-15"`). El CORE lo usa para marcar la receta como descargada y habilitar el despacho en Farmacia. Mientras la terminal esté sin conexión, la receta sigue "pendiente de descargo" hasta que llegue la sincronización.
 
 **SyncComprobanteDto:** `idLocal`, `transaccionIdLocal`, `numeroComprobante`, `fechaGeneracion`, `tipoDocumento` (`RECIBO DE CAJA` o `CONSTANCIA DE ENTREGA`), `esReimpresion`, `cantidadReimpresiones`. Se envían los metadatos; el PDF queda en la terminal.
 

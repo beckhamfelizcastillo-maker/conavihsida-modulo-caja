@@ -171,6 +171,20 @@ public class SyncApiService : ISyncApiService
             using var response =
                 await _httpClient.SendAsync(request);
 
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                // El token dura 8 horas (o viene de un login sin conexión).
+                _sessionService.TokenRechazado = true;
+
+                return new SyncResponseDto
+                {
+                    Exito = false,
+
+                    Mensaje =
+                        "La sesión venció. Vuelva a iniciar sesión para sincronizar."
+                };
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 return new SyncResponseDto

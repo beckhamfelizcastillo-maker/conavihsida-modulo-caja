@@ -229,7 +229,7 @@ public partial class TransaccionViewModel : ViewModelBase
 
     public string PreviewReceta => string.IsNullOrWhiteSpace(NumeroReceta)
         ? "—"
-        : NumeroReceta.Trim();
+        : TransaccionService.NormalizarReceta(NumeroReceta) ?? NumeroReceta.Trim();
 
     public string PreviewFecha => Formato.FechaHora(DateTime.Now);
 
@@ -415,6 +415,12 @@ public partial class TransaccionViewModel : ViewModelBase
         if (RequiereReceta && string.IsNullOrWhiteSpace(NumeroReceta))
         {
             MostrarMensaje("Escribe el número de receta para registrar la entrega de medicamentos.", TipoMensaje.Error);
+            return;
+        }
+
+        if (RequiereReceta && TransaccionService.NormalizarReceta(NumeroReceta) is null)
+        {
+            MostrarMensaje("El número de receta debe ser el número de la receta del CORE, por ejemplo 15.", TipoMensaje.Error);
             return;
         }
 

@@ -157,6 +157,8 @@ public partial class LoginViewModel : ViewModelBase
             _sessionService.Token =
                 resultado.Token;
 
+            _sessionService.TokenRechazado = false;
+
             ResultadoLogin =
                 $"Bienvenido, {resultado.NombreCompleto}.";
 

@@ -20,6 +20,25 @@ public class TransaccionService : ITransaccionService
     public static bool RequiereReceta(string? tipoServicio) =>
         tipoServicio == ServicioMedicamentos;
 
+    /// <summary>
+    /// El CORE identifica la receta por su id numérico ("15"). Acepta lo que
+    /// el cajero lea en la receta ("15", "REC-15", "#15") y devuelve solo el
+    /// número. Devuelve null si no es un número de receta válido.
+    /// </summary>
+    public static string? NormalizarReceta(string? valor)
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+        {
+            return null;
+        }
+
+        var coincidencia = System.Text.RegularExpressions.Regex.Match(
+            valor.Trim(),
+            @"^(?:[A-Za-z]{1,5}\s*[-#:]?\s*|#\s*)?0*(\d{1,9})$");
+
+        return coincidencia.Success ? coincidencia.Groups[1].Value : null;
+    }
+
     // ==========================================
     // REGISTRAR TRANSACCIÓN
     // ==========================================
@@ -70,22 +89,26 @@ public class TransaccionService : ITransaccionService
                 "Debe seleccionar el tipo de servicio.");
         }
 
-        numeroReceta =
-            string.IsNullOrWhiteSpace(numeroReceta)
-                ? null
-                : numeroReceta.Trim();
+        bool recetaEscrita =
+            !string.IsNullOrWhiteSpace(numeroReceta);
 
         if (RequiereReceta(tipoServicio) &&
-            numeroReceta is null)
+            !recetaEscrita)
         {
             throw new ArgumentException(
                 "Debe ingresar el número de receta para la entrega de medicamentos.");
         }
 
-        if (numeroReceta is { Length: > LargoMaximoReceta })
+        if (recetaEscrita)
         {
-            throw new ArgumentException(
-                $"El número de receta no puede superar {LargoMaximoReceta} caracteres.");
+            numeroReceta =
+                NormalizarReceta(numeroReceta)
+                ?? throw new ArgumentException(
+                    "El número de receta debe ser el número de la receta del CORE, por ejemplo 15.");
+        }
+        else
+        {
+            numeroReceta = null;
         }
 
         if (!esSubsidiado &&

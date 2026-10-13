@@ -93,9 +93,9 @@
                         <TextBlock Classes="label" Text="Número de receta" />
                         <TextBox Classes="mono"
                                  Text="{Binding NumeroReceta}"
-                                 PlaceholderText="Número que aparece en la receta"
-                                 MaxLength="50" />
-                        <TextBlock Classes="hint" Text="Obligatorio para medicamentos. Farmacia solo despacha recetas descargadas en Caja." />
+                                 PlaceholderText="Ejemplo: 15"
+                                 MaxLength="20" />
+                        <TextBlock Classes="hint" Text="Número de la receta del CORE (si dice REC-15, escribe 15). Farmacia solo despacha recetas descargadas en Caja." />
                     </StackPanel>
 
                     <!-- MONTO Y FORMA DE PAGO -->

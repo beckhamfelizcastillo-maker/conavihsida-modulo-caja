@@ -76,6 +76,14 @@ public class ApiService : IApiService
             return await ValidarSinConexionAsync(cedulaNormalizada);
         }
 
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _sessionService.TokenRechazado = true;
+
+            throw new InvalidOperationException(
+                "la sesión venció. Cierra sesión y vuelve a entrar.");
+        }
+
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
             return new SubsidioResponseDto

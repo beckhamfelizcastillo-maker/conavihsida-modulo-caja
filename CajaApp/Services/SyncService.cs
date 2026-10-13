@@ -349,8 +349,11 @@ public class SyncService : ISyncService
                     UsuarioCajero =
                         item.UsuarioCajero,
 
+                    // El CORE espera el id numérico ("15"); un valor como
+                    // "REC-15" guardado antes se corrige al enviarlo.
                     NumeroReceta =
-                        item.NumeroReceta
+                        TransaccionService.NormalizarReceta(item.NumeroReceta)
+                        ?? item.NumeroReceta
                 };
 
 

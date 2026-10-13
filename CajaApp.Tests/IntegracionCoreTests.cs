@@ -28,11 +28,34 @@ public class IntegracionCoreTests : BaseDatosPrueba
     {
         await _caja.AbrirCajaAsync("cajero", "María Rosario", "Ventanilla 1", 5000m, "");
 
-        var t = await _transacciones.RegistrarAsync("001-1234567-8", "Medicamentos ARV", 0m, "", true, "cajero", "  RX-2002 ");
+        var t = await _transacciones.RegistrarAsync("001-1234567-8", "Medicamentos ARV", 0m, "", true, "cajero", "  REC-2002 ");
 
         using var db = new AppDbContext();
         var guardada = await db.Transacciones.FindAsync(t.Id);
-        Assert.Equal("RX-2002", guardada!.NumeroReceta);
+        Assert.Equal("2002", guardada!.NumeroReceta);
+    }
+
+    [Theory]
+    [InlineData("15", "15")]
+    [InlineData("REC-15", "15")]
+    [InlineData("rec 15", "15")]
+    [InlineData("#015", "15")]
+    [InlineData("RX-1001", "1001")]
+    [InlineData("ABC", null)]
+    [InlineData("15-A", null)]
+    [InlineData("", null)]
+    public void Receta_SeNormalizaAlIdNumerico(string valor, string? esperado)
+    {
+        Assert.Equal(esperado, TransaccionService.NormalizarReceta(valor));
+    }
+
+    [Fact]
+    public async Task Medicamentos_RecetaNoNumerica_EsRechazada()
+    {
+        await _caja.AbrirCajaAsync("cajero", "María Rosario", "Ventanilla 1", 5000m, "");
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _transacciones.RegistrarAsync("001-1234567-8", "Medicamentos ARV", 0m, "", true, "cajero", "receta azul"));
     }
 
     [Fact]

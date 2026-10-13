@@ -15,6 +15,8 @@ public class SessionService : ISessionService
     public bool EstaAutenticado =>
         !string.IsNullOrWhiteSpace(Token);
 
+    public bool TokenRechazado { get; set; }
+
     public void CerrarSesion()
     {
         Usuario = string.Empty;
@@ -24,5 +26,7 @@ public class SessionService : ISessionService
         Rol = string.Empty;
 
         Token = string.Empty;
+
+        TokenRechazado = false;
     }
 }
