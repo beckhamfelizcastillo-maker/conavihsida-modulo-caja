@@ -210,7 +210,7 @@ public partial class SubsidioViewModel : ViewModelBase
                     ? Formato.Fecha(resultado.VigenciaHasta.Value)
                     : "Sin fecha límite";
             Cobertura = TieneSubsidio
-                ? "Gratuidad total — el beneficiario paga RD$ 0.00"
+                ? "Medicamentos ARV gratuitos (RD$ 0.00). Los demás servicios se cobran."
                 : Vencido
                     ? "La cobertura expiró; se cobra el servicio"
                     : "Sin cobertura; se cobra el servicio";

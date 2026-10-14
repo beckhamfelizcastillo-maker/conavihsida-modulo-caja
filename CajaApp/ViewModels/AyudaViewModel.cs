@@ -175,7 +175,7 @@ public partial class AyudaViewModel : ViewModelBase
                 "Solo el estado del subsidio y el dato mínimo para identificar al titular. El expediente clínico, el diagnóstico y el tratamiento permanecen fuera de este módulo, conforme a la separación de información del sistema (Ley 172-13 y RN-03)."),
             new PreguntaItem(
                 "¿Qué significa cada estado del subsidio?",
-                "Activo: la operación se registra con gratuidad (RD$ 0.00).\nVencido: la cobertura expiró y se cobra el servicio.\nNo registrado: la cédula no está en el padrón de subsidios."),
+                "Activo: la entrega de Medicamentos ARV se registra con gratuidad (RD$ 0.00). Consulta, laboratorio y procedimiento son servicios arancelados y se cobran (RN-02, RF-CAJ-04).\nVencido: la cobertura expiró y se cobra el servicio.\nNo registrado: la cédula no está en el padrón de subsidios."),
             new PreguntaItem(
                 "¿Por qué se reinició la validación al cambiar la cédula?",
                 "La gratuidad solo se aplica a la cédula que se validó. Si se cambia algún dígito, el sistema vuelve a cobrar el servicio para evitar aplicar el subsidio a otra persona."),

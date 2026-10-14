@@ -58,6 +58,18 @@ public class IntegracionCoreTests : BaseDatosPrueba
             _transacciones.RegistrarAsync("001-1234567-8", "Medicamentos ARV", 0m, "", true, "cajero", "receta azul"));
     }
 
+    [Theory]
+    [InlineData("Consulta médica")]
+    [InlineData("Laboratorio")]
+    [InlineData("Procedimiento")]
+    public async Task Subsidio_NoCubreServiciosArancelados(string servicio)
+    {
+        await _caja.AbrirCajaAsync("cajero", "María Rosario", "Ventanilla 1", 5000m, "");
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _transacciones.RegistrarAsync("001-1234567-8", servicio, 0m, "", true, "cajero"));
+    }
+
     [Fact]
     public async Task OtroServicio_NoExigeReceta()
     {

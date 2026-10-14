@@ -29,6 +29,7 @@ public partial class TransaccionViewModel : ViewModelBase
     private string _formaPago = "Efectivo";
     private string _numeroReceta = string.Empty;
     private bool _esSubsidiado;
+    private bool _subsidioVigente;
     private string _cedulaValidada = string.Empty;
     private EstadoValidacion _estadoValidacion = EstadoValidacion.SinValidar;
     private string _detalleSubsidio = "Valida la cédula para saber si aplica gratuidad.";
@@ -102,6 +103,8 @@ public partial class TransaccionViewModel : ViewModelBase
         {
             if (SetProperty(ref _tipoServicio, value))
             {
+                ActualizarGratuidad();
+
                 if (!EsSubsidiado &&
                     value is not null &&
                     PreciosReferencia.TryGetValue(value, out var precio))
@@ -111,6 +114,7 @@ public partial class TransaccionViewModel : ViewModelBase
 
                 OnPropertyChanged(nameof(EsArvSinSubsidio));
                 OnPropertyChanged(nameof(RequiereReceta));
+                OnPropertyChanged(nameof(SubsidioNoCubreServicio));
             }
         }
     }
@@ -170,9 +174,22 @@ public partial class TransaccionViewModel : ViewModelBase
                 OnPropertyChanged(nameof(PreviewPago));
                 OnPropertyChanged(nameof(EsArvSinSubsidio));
                 OnPropertyChanged(nameof(TextoBotonRegistrar));
+                OnPropertyChanged(nameof(SubsidioNoCubreServicio));
             }
         }
     }
+
+    /// <summary>
+    /// RN-02 / RF-CAJ-04: la gratuidad aplica solo a Medicamentos ARV con
+    /// subsidio vigente. Consulta, laboratorio y procedimiento se cobran.
+    /// </summary>
+    private void ActualizarGratuidad()
+    {
+        EsSubsidiado = _subsidioVigente && TransaccionService.RequiereReceta(TipoServicio);
+    }
+
+    /// <summary>Subsidio vigente, pero el servicio elegido es arancelado.</summary>
+    public bool SubsidioNoCubreServicio => _subsidioVigente && !EsSubsidiado;
 
     /// <summary>El monto y la forma de pago no se editan en una entrega subsidiada.</summary>
     public bool PuedeEditarCobro => !EsSubsidiado;
@@ -355,16 +372,18 @@ public partial class TransaccionViewModel : ViewModelBase
             if (resultado.Encontrado && resultado.TieneSubsidio && resultado.Vigente)
             {
                 _estadoValidacion = EstadoValidacion.Activo;
-                EsSubsidiado = true;
+                _subsidioVigente = true;
+                ActualizarGratuidad();
                 DetalleSubsidio = (resultado.VigenciaHasta.HasValue
-                    ? $"Cobertura {resultado.Porcentaje:N0}% vigente hasta {Formato.Fecha(resultado.VigenciaHasta.Value)}. El total se ajusta a RD$ 0.00."
-                    : $"Cobertura {resultado.Porcentaje:N0}% sin fecha límite. El total se ajusta a RD$ 0.00.") +
+                    ? $"Cobertura {resultado.Porcentaje:N0}% vigente hasta {Formato.Fecha(resultado.VigenciaHasta.Value)}. Medicamentos ARV a RD$ 0.00; los demás servicios se cobran."
+                    : $"Cobertura {resultado.Porcentaje:N0}% sin fecha límite. Medicamentos ARV a RD$ 0.00; los demás servicios se cobran.") +
                     (resultado.SinConexion ? " Validado sin conexión con el último dato guardado." : string.Empty);
             }
             else
             {
                 _estadoValidacion = EstadoValidacion.NoDisponible;
-                EsSubsidiado = false;
+                _subsidioVigente = false;
+                ActualizarGratuidad();
                 DetalleSubsidio = resultado.Encontrado || resultado.SinConexion
                     ? $"{resultado.Mensaje} La operación se cobra normalmente."
                     : "Cédula no registrada en el padrón de subsidios. La operación se cobra normalmente.";
@@ -550,13 +569,15 @@ public partial class TransaccionViewModel : ViewModelBase
     {
         _estadoValidacion = EstadoValidacion.SinValidar;
         _cedulaValidada = string.Empty;
-        EsSubsidiado = false;
+        _subsidioVigente = false;
+        ActualizarGratuidad();
         DetalleSubsidio = "Valida la cédula para saber si aplica gratuidad.";
         NotificarEstadoSubsidio();
     }
 
     private void NotificarEstadoSubsidio()
     {
+        OnPropertyChanged(nameof(SubsidioNoCubreServicio));
         OnPropertyChanged(nameof(SubsidioSinValidar));
         OnPropertyChanged(nameof(SubsidioActivo));
         OnPropertyChanged(nameof(SubsidioNoDisponible));

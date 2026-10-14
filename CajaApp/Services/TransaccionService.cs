@@ -111,6 +111,15 @@ public class TransaccionService : ITransaccionService
             numeroReceta = null;
         }
 
+        // RN-02 / RF-CAJ-04: solo el tratamiento ARV es gratuito; los
+        // servicios arancelados se cobran aunque el paciente tenga subsidio.
+        if (esSubsidiado &&
+            !RequiereReceta(tipoServicio))
+        {
+            throw new ArgumentException(
+                "El subsidio solo cubre Medicamentos ARV (RN-02). Este servicio se cobra.");
+        }
+
         if (!esSubsidiado &&
             string.IsNullOrWhiteSpace(formaPago))
         {

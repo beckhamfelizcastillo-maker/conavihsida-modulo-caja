@@ -68,3 +68,10 @@ Copia de seguridad de los archivos modificados: `D:\Desarrollo3Caja\_respaldo_an
 - **`numeroReceta` = id numérico del CORE.** Caja acepta `15`, `REC-15`, `#15` y guarda/envía `15`; rechaza textos que no sean un número de receta. La sincronización también corrige valores antiguos antes de enviarlos.
 - **Token vencido (8 h):** si el Gateway responde 401 en la sincronización o en el subsidio, la barra lateral avisa "La sesión venció: cierra sesión y vuelve a entrar…". Los registros siguen pendientes y se envían al volver a entrar.
 - **Pruebas:** 9 nuevas (73 en total, todas correctas).
+
+# Gratuidad solo para ARV (14 de octubre de 2026)
+
+- Según RN-02 y RF-CAJ-04 del SRS v1.2, solo el tratamiento antirretroviral (Medicamentos ARV) se entrega a RD$ 0.00. Consulta médica, laboratorio y procedimiento son servicios arancelados y se cobran aunque el paciente tenga subsidio activo.
+- Nueva transacción: con subsidio activo y un servicio arancelado, aparece el aviso "El subsidio cubre solo Medicamentos ARV…" y se cobra normalmente. `TransaccionService` rechaza una operación subsidiada que no sea ARV.
+- Textos actualizados en Validar subsidio y Preguntas frecuentes.
+- **Pruebas:** 3 nuevas (76 en total, todas correctas).

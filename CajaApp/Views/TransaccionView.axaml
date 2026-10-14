@@ -122,7 +122,13 @@
                     <Border Classes="notice verde" Margin="0,0,0,14" IsVisible="{Binding EsSubsidiado}">
                         <DockPanel>
                             <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoCheck}" />
-                            <TextBlock Text="Este beneficiario tiene subsidio activo: la operación se registra con gratuidad y el total se ajusta automáticamente a RD$ 0.00." />
+                            <TextBlock Text="Entrega de Medicamentos ARV con subsidio activo: se registra con gratuidad y el total se ajusta a RD$ 0.00 (RN-02)." TextWrapping="Wrap" />
+                        </DockPanel>
+                    </Border>
+                    <Border Classes="notice amarillo" Margin="0,0,0,14" IsVisible="{Binding SubsidioNoCubreServicio}">
+                        <DockPanel>
+                            <PathIcon DockPanel.Dock="Left" Data="{StaticResource IconoAlerta}" />
+                            <TextBlock Text="El subsidio cubre solo Medicamentos ARV. Este servicio es arancelado y se cobra normalmente (RF-CAJ-04)." TextWrapping="Wrap" />
                         </DockPanel>
                     </Border>
                     <Border Classes="notice amarillo" Margin="0,0,0,14" IsVisible="{Binding EsArvSinSubsidio}">
